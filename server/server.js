@@ -6,6 +6,7 @@ const cors = require('cors');
 const querystring = require('querystring');
 const cookieParser = require('cookie-parser');
 const app = express();
+require('dotenv').config();
 
 const corsOptions = { 
   origin: 'http://localhost:3000',
@@ -15,8 +16,8 @@ app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.static(__dirname + '/public'));
 
-const CLIENT_ID = '9b655af69eb243c98069a6c4965afc16'
-const CLIENT_SECRET = '15de6297eacb4dcb968f9930725f8bf5'
+const CLIENT_ID = process.env.CLIENT_ID;
+const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = 'http://localhost:3500/callback'
 
 const generateRandomString = (length) => {
@@ -48,12 +49,8 @@ app.get('/login', function(req, res) {
     }));
 });
 
+// request refresh and access tokens after checking the state parameter
 app.get('/callback', function(req, res) {
-  console.log('callback called');
-
-  // your application requests refresh and access tokens
-  // after checking the state parameter
-
   var code = req.query.code || null;
   var state = req.query.state || null;
   var storedState = req.cookies ? req.cookies[stateKey] : null;
