@@ -58,15 +58,15 @@ app.get('/callback', function(req, res) {
   var state = req.query.state || null;
   var storedState = req.cookies ? req.cookies[stateKey] : null;
   if (state === null || state !== storedState) {
-    res.redirect('http://localhost:3000' +
-      '?' + querystring.stringify({
+    res.redirect('http://localhost:3000?' +
+      querystring.stringify({
         error: 'state_mismatch'
       })
     );
   } else if (code === null) {
     console.log('test1');
-    res.redirect('http://localhost:3000' +
-      '?' + querystring.stringify({
+    res.redirect('http://localhost:3000?' +
+      querystring.stringify({
         error: 'not_authorized'
       })
     );
@@ -96,8 +96,8 @@ app.get('/callback', function(req, res) {
 
         res.redirect('http://localhost:3000/home');
       } else {
-        res.redirect('http://localhost:3000' +
-          '?' + querystring.stringify({
+        res.redirect('http://localhost:3000?' +
+          querystring.stringify({
             error: 'invalid_token'
           })
         );
@@ -106,21 +106,49 @@ app.get('/callback', function(req, res) {
   }
 });
 
-
+// get request for top artists
 app.get('/api/topArtists', (req, res) => {
   var options = {
-    url: 'https://api.spotify.com/v1/me',
-    headers: { 'Authorization': 'Bearer ' + accessToken },
+    url: 'https://api.spotify.com/v1/me/top/artists?' +
+      querystring.stringify({
+        time_range: 'long_term',    // short_term = 1M, medium_term = 6M, long_term = 1Y
+        limit: 10,
+        offset: 0
+      }),
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + accessToken 
+    },
     json: true 
   };
 
-  // use the access token to access the Spotify Web API
   request.get(options, function(error, response, body) {
-    console.log(body.display_name);
     res.json(body);
   });
 });
 
+// get request for top songs
+app.get('/api/topSongs', (req, res) => {
+  var options = {
+    url: 'https://api.spotify.com/v1/me/top/tracks?' +
+      querystring.stringify({
+        time_range: 'long_term',    // short_term = 1M, medium_term = 6M, long_term = 1Y
+        limit: 10,
+        offset: 0
+      }),
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + accessToken 
+    },
+    json: true 
+  };
+
+  request.get(options, function(error, response, body) {
+    res.json(body);
+  });
+});
+
+// get request for profile picture
 app.get('/api/profilePic', (req, res) => {
   var options = {
     url: 'https://api.spotify.com/v1/me',
@@ -128,10 +156,8 @@ app.get('/api/profilePic', (req, res) => {
     json: true 
   };
 
-  // use the access token to access the Spotify Web API
   request.get(options, function(error, response, body) {
     if (body.images && body.images.length > 1) {
-      console.log(body.images[1].url);
       res.json({pic: body.images[1].url});
     }
     // TODO: if image doesnt exist, make a default one 

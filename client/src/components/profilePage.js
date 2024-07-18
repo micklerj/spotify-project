@@ -3,14 +3,13 @@ import {Container, Button, Row, Card, Navbar, Nav} from 'react-bootstrap';
 import React, {useState, useEffect} from 'react';
 
 
-const CLIENT_ID     = '9b655af69eb243c98069a6c4965afc16'
-const CLIENT_SECRET = '15de6297eacb4dcb968f9930725f8bf5'
 
 function ProfilePage() {
   const [artists, setArtists] = useState([]);
   const [songs, setSongs] = useState([]);
   const [albugenresms, setGenres] = useState([]);
   const [profilePic, setProfilePic] = useState('');
+  const [topItems, settopItems] = useState([]);
 
   useEffect(() => {
     fetch('/api/profilePic')
@@ -29,7 +28,22 @@ function ProfilePage() {
     fetch('/api/topArtists')
       .then(response => response.json())
       .then(data => {
-        console.log(data.display_name);
+        console.log(data);
+        setArtists(data.items.map(item => item.name));
+        settopItems(artists);
+      })
+      .catch((error) => { 
+        console.error('Error:', error); 
+      });
+  }
+  
+  async function getTopSongs() {
+    fetch('/api/topSongs')
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        setSongs(data.items.map(item => item.name));
+        settopItems(songs);
       })
       .catch((error) => { 
         console.error('Error:', error); 
@@ -55,25 +69,18 @@ function ProfilePage() {
 
         <Row className="justify-content-center mt-4">
           <Button variant="primary" className="mr-2" onClick={getTopArtists}>Button 1</Button>
-          <Button variant="secondary">Button 2</Button>
+          <Button variant="secondary" onClick={getTopSongs}>Button 2</Button>
         </Row>
 
         <Row className="justify-content-center mt-4">
           <Card style={{ width: "400px" }}>
             <Card.Body>
               <Card.Title>List of Items</Card.Title>
-              <ul>
-                <li>Item 1</li>
-                <li>Item 2</li>
-                <li>Item 3</li>
-                <li>Item 4</li>
-                <li>Item 5</li>
-                <li>Item 6</li>
-                <li>Item 7</li>
-                <li>Item 8</li>
-                <li>Item 9</li>
-                <li>Item 10</li>
-              </ul>
+              <ol>
+                {topItems.map((artist, index) => (
+                  <li key={index}>{artist}</li>
+                ))}
+              </ol>
             </Card.Body>
           </Card>
         </Row>
