@@ -8,7 +8,7 @@ const cookieParser = require('cookie-parser');
 const app = express();
 
 const corsOptions = { 
-  origin: 'http://localhost:3001',
+  origin: 'http://localhost:3000',
   credentials: true,  
 };
 app.use(cors(corsOptions));
@@ -94,19 +94,6 @@ app.get('/callback', function(req, res) {
         //TODO: store the tokens in a database instead
         //TODO: manage refresh tokens
 
-        /*
-        var options = {
-          url: 'https://api.spotify.com/v1/me',
-          headers: { 'Authorization': 'Bearer ' + access_token },
-          json: true 
-        };
-
-        // use the access token to access the Spotify Web API
-        request.get(options, function(error, response, body) {
-          console.log(body);
-        });
-        */
-        // we can also pass the token to the browser to make requests from there
         res.redirect('http://localhost:3000/home');
       } else {
         res.redirect('http://localhost:3000' +
@@ -119,6 +106,37 @@ app.get('/callback', function(req, res) {
   }
 });
 
+
+app.get('/api/topArtists', (req, res) => {
+  var options = {
+    url: 'https://api.spotify.com/v1/me',
+    headers: { 'Authorization': 'Bearer ' + accessToken },
+    json: true 
+  };
+
+  // use the access token to access the Spotify Web API
+  request.get(options, function(error, response, body) {
+    console.log(body.display_name);
+    res.json(body);
+  });
+});
+
+app.get('/api/profilePic', (req, res) => {
+  var options = {
+    url: 'https://api.spotify.com/v1/me',
+    headers: { 'Authorization': 'Bearer ' + accessToken },
+    json: true 
+  };
+
+  // use the access token to access the Spotify Web API
+  request.get(options, function(error, response, body) {
+    if (body.images && body.images.length > 1) {
+      console.log(body.images[1].url);
+      res.json({pic: body.images[1].url});
+    }
+    // TODO: if image doesnt exist, make a default one 
+  });
+});
 
 
 app.get('/api/example', (req, res) => {
