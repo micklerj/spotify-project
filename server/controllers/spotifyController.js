@@ -1,0 +1,290 @@
+const request = require('request');
+const crypto = require('crypto');
+const querystring = require('querystring');
+const axios = require('axios');
+require('dotenv').config();
+
+const CLIENT_ID = process.env.CLIENT_ID;
+const CLIENT_SECRET = process.env.CLIENT_SECRET;
+const REDIRECT_URI = 'http://localhost:3500/api/callback'
+
+
+var stateKey = 'spotify_auth_state';
+// temporarily storing access and refresh tokens here
+let accessToken = null;
+let refreshToken = null;
+
+const User = require("../model/user");
+
+const generateRandomString = (length) => {
+  return crypto
+  .randomBytes(60)
+  .toString('hex')
+  .slice(0, length);
+}
+
+// spotify authorization
+login = function(req, res) {
+
+  var state = generateRandomString(16);
+  var scope = 'user-top-read user-follow-read user-read-recently-played';
+  res.cookie(stateKey, state);
+
+  // your application requests authorization
+  res.redirect('https://accounts.spotify.com/authorize?' +
+    querystring.stringify({
+      response_type: 'code',
+      client_id: CLIENT_ID,
+      scope: scope,
+      redirect_uri: REDIRECT_URI,
+      state: state
+    }));
+};
+
+// request refresh and access tokens after checking the state parameter
+callback = function(req, res) {
+  console.log('callback');
+  var code = req.query.code || null;
+  var state = req.query.state || null;
+  var storedState = req.cookies ? req.cookies[stateKey] : null;
+  if (state === null || state !== storedState) {
+    res.redirect('http://localhost:3000?' +
+      querystring.stringify({
+        error: 'state_mismatch'
+      })
+    );
+  } else if (code === null) {
+    res.redirect('http://localhost:3000?' +
+      querystring.stringify({
+        error: 'not_authorized'
+      })
+    );
+  } else {
+    res.clearCookie(stateKey);
+    var authOptions = {
+      url: 'https://accounts.spotify.com/api/token',
+      form: {
+        code: code,
+        redirect_uri: REDIRECT_URI,
+        grant_type: 'authorization_code'
+      },
+      headers: {
+        'content-type': 'application/x-www-form-urlencoded',
+        Authorization: 'Basic ' + (new Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64'))
+      },
+      json: true
+    };
+
+    request.post(authOptions, function(error, response, body) {
+      if (!error && response.statusCode === 200) { 
+ 
+        accessToken = body.access_token,
+        refreshToken = body.refresh_token;
+        //TODO: store the tokens in a database instead
+        //TODO: manage refresh tokens
+
+        // --------------------------------------------------------------------------
+        // create new user if it doesn't exist
+        var options = {
+          url: 'https://api.spotify.com/v1/me',
+          headers: { 'Authorization': 'Bearer ' + accessToken },
+          json: true 
+        };
+      
+        request.get(options, async function(error, response, body) {
+          if (body.images && body.images.length > 1) {
+            const postData = {
+              "username": body.display_name,
+              "profilePic": body.images[1].url,
+              "userID": body.id,
+              "privacy": "public",
+              "accessToken": accessToken,
+              "refreshToken": refreshToken,
+              "topArtists1M": [],
+              "topArtists6M": [],
+              "topArtists1Y": [],
+              "topSongs1M": [],
+              "topSongs6M": [],
+              "topSongs1Y": [],
+              "topGenres1M": [],
+              "topGenres6M": [],
+              "topGenres1Y": []
+            }
+
+            await axios.post('http://localhost:3500/api/newUser', postData)
+              .catch((error) => { 
+                console.error('Error:', error);
+              })
+          }
+          // --------------------------------------------------------------------------
+        });
+
+        res.redirect('http://localhost:3000/home');
+      } else {
+        res.redirect('http://localhost:3000?' +
+          querystring.stringify({
+            error: 'invalid_token'
+          })
+        );
+      }
+    });
+  }
+};
+
+// get request for top artists
+topArtists = function(req, res) {
+  var timeFrame = req.query.timeFrame || 'short_term'; // Use the timeframe query parameter if it exists, otherwise default to 'long_term'
+  var count = req.query.count || 10; 
+  var init = req.query.init === 'true'; 
+  var options = {
+    url: 'https://api.spotify.com/v1/me/top/artists?' +
+      querystring.stringify({
+        time_range: timeFrame,    // short_term = 1M, medium_term = 6M, long_term = 1Y
+        limit: count,
+        offset: 0
+      }),
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + accessToken 
+    },
+    json: true 
+  };
+
+  request.get(options, async function(error, response, body) {
+    // update database if init is true (first rendering of the user's profile)
+    if (init) {
+      // get user ID
+      const profileBody = await getProfileInfo(accessToken);
+      var userID = profileBody.id;
+
+      // set timeframe for updated database content
+      var topArtistsTime = '';
+      if      (timeFrame === 'short_term')  { topArtistsTime = 'topArtists1M'; }
+      else if (timeFrame === 'medium_term') { topArtistsTime = 'topArtists6M'; }
+      else                                  { topArtistsTime = 'topArtists1Y'; }
+
+      // create array of song objects
+      const artistArray = body.items.map(item => ({
+        artistName: item.name,
+        image: item.images[0].url,
+        url: item.external_urls.spotify
+      }));
+
+      const putData = {
+        "userID": userID,
+        [topArtistsTime]: artistArray
+      }
+
+      axios.put('http://localhost:3500/api/updateArtists', putData)
+        .catch((error) => { 
+          console.error('Error:', error);
+        })
+    }
+    res.json(body);
+  });
+};
+
+// get request for top songs
+topSongs = function(req, res) {
+  var timeFrame = req.query.timeFrame || 'short_term';
+  var count = req.query.count || 10; 
+  var init = req.query.init === 'true'; 
+  var options = {
+    url: 'https://api.spotify.com/v1/me/top/tracks?' +
+      querystring.stringify({
+        time_range: timeFrame,
+        limit: count,
+        offset: 0
+      }),
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + accessToken 
+    },
+    json: true 
+  };
+
+  request.get(options, async function(error, response, body) { 
+    // update database if init is true (first rendering of the user's profile)
+    if (init) {
+      // get user ID
+      const profileBody = await getProfileInfo(accessToken);
+      var userID = profileBody.id;
+
+      // set timeframe for updated database content
+      var topSongsTime = '';
+      if      (timeFrame === 'short_term')  { topSongsTime = 'topSongs1M'; }
+      else if (timeFrame === 'medium_term') { topSongsTime = 'topSongs6M'; }
+      else                                  { topSongsTime = 'topSongs1Y'; }
+
+      // create array of song objects
+      const songArray = body.items.map(item => ({
+        songName: item.name,
+        artistName: item.artists[0].name,
+        image: item.album.images[0].url,
+        url: item.external_urls.spotify
+      }));
+
+      const putData = {
+        "userID": userID,
+        [topSongsTime]: songArray
+      }
+
+      axios.put('http://localhost:3500/api/updateSongs', putData)
+        .catch((error) => { 
+          console.error('Error:', error);
+        })
+    }
+    res.json(body);
+  });
+};
+
+topGenres = function(req, res) {
+  var timeFrame = req.query.timeFrame || 'short_term';
+  var count = req.query.count || 10;
+  var init = req.query.init === 'true'; 
+  //TODO = logic for getting genres
+}
+
+// get request for profile picture and display_name(username)
+profileInfo = function(req, res) {
+  // var options = {
+  //   url: 'https://api.spotify.com/v1/me',
+  //   headers: { 'Authorization': 'Bearer ' + accessToken },
+  //   json: true 
+  // };
+
+  // request.get(options, function(error, response, body) {
+  //   if (body.images && body.images.length > 1) {
+  //     res.json(body);
+  //   }
+  // });
+  getProfileInfo(accessToken)
+    .then(body => {
+      res.json(body);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      res.status(500).json({ error: 'An error occurred' });
+    });  
+};
+
+function getProfileInfo(accessToken) {
+  return new Promise((resolve, reject) => {
+    var options = {
+      url: 'https://api.spotify.com/v1/me',
+      headers: { 'Authorization': 'Bearer ' + accessToken },
+      json: true 
+    };
+
+    request.get(options, function(error, response, body) {   // TODO: switch all requests to axios
+      if (error) {
+        reject(error);
+      }
+      resolve(body);
+    });
+  });
+}
+
+
+
+module.exports = { login, callback, topArtists, topSongs, profileInfo };

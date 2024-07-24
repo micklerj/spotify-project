@@ -7,7 +7,7 @@ function Login() {
   const [authResponse, setAuthResponse] = useState([{}]);
 
   async function handleLogin() {
-    window.location.href = 'http://localhost:3500/api/login';
+    window.location.href = 'http://localhost:3500/login';
   }
 
   return (
