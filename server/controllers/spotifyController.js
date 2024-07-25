@@ -10,11 +10,6 @@ const REDIRECT_URI = 'http://localhost:3500/api/callback'
 
 
 var stateKey = 'spotify_auth_state';
-// temporarily storing access and refresh tokens here
-let accessToken = null;
-let refreshToken = null;
-
-const User = require("../model/user");
 
 const generateRandomString = (length) => {
   return crypto
@@ -78,16 +73,16 @@ callback = function(req, res) {
     request.post(authOptions, function(error, response, body) {
       if (!error && response.statusCode === 200) { 
  
-        accessToken = body.access_token,
-        refreshToken = body.refresh_token;
-        //TODO: store the tokens in a database instead
-        //TODO: manage refresh tokens
+        req.session.accessToken = body.access_token,
+        req.session.refreshToken = body.refresh_token;
+        req.session.tokenExpirationTime = Date.now() + (body.expires_in * 1000); // milliseconds
+        //TODO: manage refreshing access tokens
 
         // --------------------------------------------------------------------------
         // create new user if it doesn't exist
         var options = {
           url: 'https://api.spotify.com/v1/me',
-          headers: { 'Authorization': 'Bearer ' + accessToken },
+          headers: { 'Authorization': 'Bearer ' + req.session.accessToken },
           json: true 
         };
       
@@ -98,8 +93,8 @@ callback = function(req, res) {
               "profilePic": body.images[1].url,
               "userID": body.id,
               "privacy": "public",
-              "accessToken": accessToken,
-              "refreshToken": refreshToken,
+              "accessToken": req.session.accessToken,  // TODO: might can delete these tokens
+              "refreshToken": req.session.refreshToken,
               "topArtists1M": [],
               "topArtists6M": [],
               "topArtists1Y": [],
@@ -145,7 +140,7 @@ topArtists = function(req, res) {
       }),
     headers: { 
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + accessToken 
+      'Authorization': 'Bearer ' + req.session.accessToken 
     },
     json: true 
   };
@@ -154,7 +149,7 @@ topArtists = function(req, res) {
     // update database if init is true (first rendering of the user's profile)
     if (init) {
       // get user ID
-      const profileBody = await getProfileInfo(accessToken);
+      const profileBody = await getProfileInfo(req.session.accessToken);
       var userID = profileBody.id;
 
       // set timeframe for updated database content
@@ -198,7 +193,7 @@ topSongs = function(req, res) {
       }),
     headers: { 
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + accessToken 
+      'Authorization': 'Bearer ' + req.session.accessToken 
     },
     json: true 
   };
@@ -207,7 +202,7 @@ topSongs = function(req, res) {
     // update database if init is true (first rendering of the user's profile)
     if (init) {
       // get user ID
-      const profileBody = await getProfileInfo(accessToken);
+      const profileBody = await getProfileInfo(req.session.accessToken);
       var userID = profileBody.id;
 
       // set timeframe for updated database content
@@ -245,20 +240,19 @@ topGenres = function(req, res) {
   //TODO = logic for getting genres
 }
 
+// TODO: delete this function
+test = function(req, res) {
+  if (req.session.name) {
+    console.log(req.session.name);
+  }
+  req.session.test = 'test123';
+  req.session.name = "bob";
+  res.json(req.session);
+}
+
 // get request for profile picture and display_name(username)
 profileInfo = function(req, res) {
-  // var options = {
-  //   url: 'https://api.spotify.com/v1/me',
-  //   headers: { 'Authorization': 'Bearer ' + accessToken },
-  //   json: true 
-  // };
-
-  // request.get(options, function(error, response, body) {
-  //   if (body.images && body.images.length > 1) {
-  //     res.json(body);
-  //   }
-  // });
-  getProfileInfo(accessToken)
+  getProfileInfo(req.session.accessToken)
     .then(body => {
       res.json(body);
     })
@@ -285,6 +279,55 @@ function getProfileInfo(accessToken) {
   });
 }
 
+// logic for checking if a user is authenticated
+ensureAuth = async function(req, res, next) {
+  if (!req.session.accessToken || !req.session.refreshToken) {
+    // user is not authenticated
+    console.log('User is not authenticated');
+    return res.json({ isAuthenticated: 'false' });
+    // res.redirect('http://localhost:3000'); 
+  }
+  
+  const currentTime = Date.now();
+  if (req.session.tokenExpirationTime && currentTime > req.session.tokenExpirationTime) {
+    try {
+      await refreshAccessToken(req);
+    } catch (error) {
+      return res.status(500).send('Error refreshing access token');
+    }
+  }
+  console.log('User is authenticated');
+  return res.json({ isAuthenticated: 'true' });
+}
 
+// refresh access token
+async function refreshAccessToken(req) {
+  try {
+    var authOptions = {
+      url: 'https://accounts.spotify.com/api/token',
+      headers: {
+        'content-type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Basic ' + (new Buffer.from(client_id + ':' + client_secret).toString('base64'))
+      },
+      form: {
+        grant_type: 'refresh_token',
+        refresh_token: req.session.refreshToken
+      },
+      json: true
+    };
 
-module.exports = { login, callback, topArtists, topSongs, profileInfo };
+    request.post(authOptions, function(error, response, body) {
+      if (!error && response.statusCode === 200) {
+        req.session.accessToken = body.access_token,
+        req.session.refreshToken = body.refresh_token;
+      }
+    });
+  } 
+  catch (error) {
+    console.error('Error refreshing access token:', error);
+    throw new Error('Unable to refresh access token');
+  }
+}
+// TODO: still need to test when you need to refresh the access token
+
+module.exports = { login, callback, topArtists, topSongs, profileInfo, test, ensureAuth };

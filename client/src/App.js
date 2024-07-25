@@ -4,7 +4,7 @@ import Login from './pages/Login';
 import NoPage from './pages/NoPage';
 import ProtectedRoute from './components/protectedRoute';
 
-
+// TODO: switch / to home and /login to login
 
 import logo from './logo.svg';
 

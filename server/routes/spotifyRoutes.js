@@ -14,5 +14,9 @@ router.get('/topSongs', spotifyController.topSongs);
 
 router.get('/profileInfo', spotifyController.profileInfo);
 
+router.get('/test', spotifyController.test);
+
+router.get('/ensureAuth', spotifyController.ensureAuth);
+
 
 module.exports = router;
