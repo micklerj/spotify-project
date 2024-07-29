@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const querystring = require('querystring');
 const axios = require('axios');
 require('dotenv').config();
+const qs = require('qs');
 
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
@@ -36,7 +37,7 @@ login = function(req, res) {
     }));
 };
 
-// request refresh and access tokens after checking the state parameter
+// request refresh and access tokens after checking the state parameter,        creates new user in DB if needed
 callback = function(req, res) {
   console.log('callback');
   var code = req.query.code || null;
@@ -76,7 +77,6 @@ callback = function(req, res) {
         req.session.accessToken = body.access_token,
         req.session.refreshToken = body.refresh_token;
         req.session.tokenExpirationTime = Date.now() + (body.expires_in * 1000); // milliseconds
-        //TODO: manage refreshing access tokens
 
         // --------------------------------------------------------------------------
         // create new user if it doesn't exist
@@ -92,9 +92,7 @@ callback = function(req, res) {
               "username": body.display_name,
               "profilePic": body.images[1].url,
               "userID": body.id,
-              "privacy": "public",
-              "accessToken": req.session.accessToken,  // TODO: might can delete these tokens
-              "refreshToken": req.session.refreshToken,
+              "privacy": "Public",
               "topArtists1M": [],
               "topArtists6M": [],
               "topArtists1Y": [],
@@ -240,7 +238,7 @@ topGenres = function(req, res) {
   //TODO = logic for getting genres
 }
 
-// TODO: delete this function
+// TODO: delete this function and route
 test = function(req, res) {
   if (req.session.name) {
     console.log(req.session.name);
@@ -302,32 +300,27 @@ ensureAuth = async function(req, res, next) {
 
 // refresh access token
 async function refreshAccessToken(req) {
-  try {
-    var authOptions = {
-      url: 'https://accounts.spotify.com/api/token',
-      headers: {
-        'content-type': 'application/x-www-form-urlencoded',
-        'Authorization': 'Basic ' + (new Buffer.from(client_id + ':' + client_secret).toString('base64'))
-      },
-      form: {
-        grant_type: 'refresh_token',
-        refresh_token: req.session.refreshToken
-      },
-      json: true
-    };
+  console.log('refreshing access token');
+  const authOptions = {
+    method: 'post',
+    url: 'https://accounts.spotify.com/api/token',
+    headers: {
+      'content-type': 'application/x-www-form-urlencoded',
+      'Authorization': 'Basic ' + (new Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64'))
+    },
+    data: qs.stringify({
+      grant_type: 'refresh_token',
+      refresh_token: req.session.refreshToken
+    })
+  };
 
-    request.post(authOptions, function(error, response, body) {
-      if (!error && response.statusCode === 200) {
-        req.session.accessToken = body.access_token,
-        req.session.refreshToken = body.refresh_token;
-      }
-    });
-  } 
-  catch (error) {
+  try {
+    const response = await axios(authOptions);
+    req.session.accessToken = response.data.access_token;
+    // req.session.refreshToken = response.data.refresh_token;      // wasn't working but i dont think this is needed 
+  } catch (error) {
     console.error('Error refreshing access token:', error);
-    throw new Error('Unable to refresh access token');
   }
 }
-// TODO: still need to test when you need to refresh the access token
 
 module.exports = { login, callback, topArtists, topSongs, profileInfo, test, ensureAuth };

@@ -2,6 +2,8 @@ import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import NoPage from './pages/NoPage';
+import Following from './pages/Following';
+import Explore from './pages/Explore';
 import ProtectedRoute from './components/protectedRoute';
 
 // TODO: switch / to home and /login to login
@@ -19,6 +21,16 @@ function App() {
           <Route path="/home" element={
             <ProtectedRoute>
               <Home />
+            </ProtectedRoute>
+          } />
+          <Route path="/following" element={ 
+            <ProtectedRoute>
+              <Following /> 
+            </ProtectedRoute>
+          } />
+          <Route path="/explore" element={ 
+            <ProtectedRoute>
+              <Explore /> 
             </ProtectedRoute>
           } />
           <Route path="*" element={<NoPage />} />

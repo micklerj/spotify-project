@@ -1,6 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Container, Button, Row, Card, Navbar, Nav} from 'react-bootstrap';
 import React, {useState, useEffect} from 'react';
+import axios from 'axios';
 
 
 
@@ -21,19 +22,36 @@ function ProfilePage() {
   const [genreCount, setGenreCount] = useState(10);
   const [profilePic, setProfilePic] = useState('');
   const [userName, setUserName] = useState('');
+  const [ID, setID] = useState('');
+  const [privacy, setPrivacy] = useState('');
 
-  // get profile pic and username
+  // get profile pic, username, and ID
   useEffect(() => {
     fetch('/api/profileInfo')
       .then(response => response.json())
       .then(data => {
         setProfilePic(data.images[1].url);
         setUserName(data.display_name);
+        setID(data.id);
       })
       .catch((error) => { 
         console.error('Error:', error); 
       });
   }, []);
+
+  // get privacy setting
+  useEffect(() => {
+    if (ID) {               // Make sure ID is not null
+      fetch(`/api/getUser?ID=${ID}`)
+        .then(response => response.json())
+        .then(data => {
+          setPrivacy(data.privacy);
+        })
+        .catch((error) => { 
+          console.error('Error:', error); 
+        });
+    }
+  }, [ID]);
 
   // default = top artists over last month   and load info into database
   useEffect(() => {
@@ -78,15 +96,17 @@ function ProfilePage() {
   }
 
   // get top songs
-  async function handleTopSongs(timeFrame, count, init = false) {
+  async function handleTopSongs(timeFrame, count, init = false, loadOnPage = true) {
     fetch(`/api/topSongs?timeFrame=${timeFrame}&count=${count}&init=${init}`)
       .then(response => response.json())
       .then(data => {
-        console.log(data);
-        setSongs(data.items.map(item => item.name));
-        setSongPics(data.items.map(item => item.album.images[0].url));
-        setSongSingers(data.items.map(item => item.artists[0].name));
-        setSongURLs(data.items.map(item => item.external_urls.spotify));
+        if (loadOnPage) {
+          console.log(data);
+          setSongs(data.items.map(item => item.name));
+          setSongPics(data.items.map(item => item.album.images[0].url));
+          setSongSingers(data.items.map(item => item.artists[0].name));
+          setSongURLs(data.items.map(item => item.external_urls.spotify));
+        }
       })
       .catch((error) => { 
         console.error('Error:', error); 
@@ -94,7 +114,7 @@ function ProfilePage() {
   }
 
   // get top genres
-  async function handleTopGenres(timeFrame, count, init = false) {
+  async function handleTopGenres(timeFrame, count, init = false, loadOnPage = true) {
     fetch(`/api/topGenres?timeFrame=${timeFrame}&count=${count}&init=${init}`)
       .then(response => response.json())
       .then(data => {
@@ -126,12 +146,33 @@ function ProfilePage() {
     }
   }
 
+  // change privacy setting
+  async function handleChangePrivacy() {
+    const putData = {
+      "userID": ID,
+      "privacy": privacy === 'Public' ? 'Private' : 'Public'
+    };
+
+    if (privacy === 'Public') {
+      setPrivacy('Private');
+    } else {
+      setPrivacy('Public');
+    }
+
+    axios.put('/api/changePrivacy', putData)      
+      .catch((error) => { 
+        console.error('Error:', error); 
+      });
+  }
+
   return (
     <div>
       <Row bg="light" expand="lg" className="d-flex align-items-center">
         <div style={{ display: 'flex', alignItems: 'center', marginLeft: '50px' }}>
           <img src={profilePic} alt="Profile Picture" className="rounded-circle mr-2" style={{ width: "200px" }} />
           <h1 style={{ marginLeft: '20px' }}>{userName}</h1>
+          <h2 style={{ marginLeft: '20px' }}>{privacy}</h2>
+          <Button variant="secondary" style={{ marginLeft: '20px' }} onClick={handleChangePrivacy}>Change Privacy</Button>
         </div>
       </Row>
 
@@ -277,23 +318,7 @@ function ProfilePage() {
 
       </Container>
 
-      <Navbar fixed="bottom" bg="light" className="justify-content-center">
-        <Nav.Item>
-          <Nav.Link href="#option1">
-          <Button variant="secondary" style={{ borderRadius: '50%', width: '30px', height: '30px', marginLeft: '10px', fontSize: '10px', whiteSpace: 'nowrap' }}>1</Button>
-          </Nav.Link>
-        </Nav.Item>
-        <Nav.Item>
-          <Nav.Link href="#option2">
-            <Button variant="secondary" style={{ borderRadius: '50%', width: '30px', height: '30px', marginLeft: '10px', fontSize: '10px', whiteSpace: 'nowrap' }}>2</Button>
-          </Nav.Link>
-        </Nav.Item>
-        <Nav.Item>
-          <Nav.Link href="#option3">
-          <Button variant="secondary" style={{ borderRadius: '50%', width: '30px', height: '30px', marginLeft: '10px', fontSize: '10px', whiteSpace: 'nowrap' }}>3</Button>
-          </Nav.Link>
-        </Nav.Item>
-      </Navbar>
+      
     </div>
   );
 }

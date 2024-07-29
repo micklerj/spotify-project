@@ -1,7 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Container, InputGroup, FormControl, Button, Row, Card} from 'react-bootstrap';
 import React, {useState, useEffect} from 'react';
-import Header from '../components/header';
 
 function Login() {
   const [authResponse, setAuthResponse] = useState([{}]);
@@ -12,7 +11,6 @@ function Login() {
 
   return (
     <div className="login page">
-      <Header />
       <div>
         <p>Login Page</p>
       </div>

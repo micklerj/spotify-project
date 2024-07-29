@@ -1,7 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Container, InputGroup, FormControl, Button, Row, Card} from 'react-bootstrap';
 import React, {useState, useEffect} from 'react';
-import Header from '../components/header';
+import Footer from '../components/footerButtons';
 import ArtistSearch from '../components/artistSearch';
 import ProfilePage from '../components/profilePage';
 
@@ -18,7 +18,6 @@ function Home() {
   return (    
     
     <div className="home page">
-      <Header />
 
       <div>
         {(typeof backendData.message === 'undefined') ? (
@@ -29,6 +28,8 @@ function Home() {
       </div>
 
       <ProfilePage />      
+
+      <Footer />
       
     </div>
     

@@ -18,14 +18,6 @@ const userSchema = new Schema({
     type: String,
     required: true
   },
-  accessToken: {
-    type: String,
-    required: true
-  },
-  refreshToken: {
-    type: String,
-    required: true
-  },
   topArtists1M: [{
     artistName: {
       type: String,

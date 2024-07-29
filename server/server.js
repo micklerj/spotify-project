@@ -19,7 +19,8 @@ app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.static(__dirname + '/public'));
 
-app.use(session({             // For production use, store sessions in a persistent store like Redis or a database instead of the default in-memory store to handle scaling and persistence.
+// session for managing access and refresh tokens
+app.use(session({          
   store: MongoStore.create({ 
     mongoUrl: process.env.DATABASE_URI,
     dbName: 'spotifyAppDB',

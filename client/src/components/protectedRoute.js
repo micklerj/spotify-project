@@ -5,9 +5,11 @@ const ProtectedRoute = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(null);
 
     useEffect(() => {
+        console.log('protected route entered');
         fetch(`/api/ensureAuth`)
             .then(response => response.json())
             .then(data => {
+                console.log('callback from ensureAuth');
                 if (data.isAuthenticated && data.isAuthenticated === 'true') {
                     setIsAuthenticated(true);    
                 } else {
