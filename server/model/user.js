@@ -18,6 +18,9 @@ const userSchema = new Schema({
     type: String,
     required: true
   },
+  following: [{
+    type: String
+  }],
   topArtists1M: [{
     artistName: {
       type: String,

@@ -23,7 +23,7 @@ const generateRandomString = (length) => {
 login = function(req, res) {
 
   var state = generateRandomString(16);
-  var scope = 'user-top-read user-follow-read user-read-recently-played';
+  var scope = 'user-top-read user-follow-read user-read-recently-played user-follow-modify';
   res.cookie(stateKey, state);
 
   // your application requests authorization
@@ -76,7 +76,7 @@ callback = function(req, res) {
  
         req.session.accessToken = body.access_token,
         req.session.refreshToken = body.refresh_token;
-        req.session.tokenExpirationTime = Date.now() + (body.expires_in * 1000); // milliseconds
+        req.session.tokenExpirationTime = Date.now() + (body.expires_in * 1000); // 1 hour in milliseconds
 
         // --------------------------------------------------------------------------
         // create new user if it doesn't exist
@@ -93,6 +93,7 @@ callback = function(req, res) {
               "profilePic": body.images[1].url,
               "userID": body.id,
               "privacy": "Public",
+              "following": [],
               "topArtists1M": [],
               "topArtists6M": [],
               "topArtists1Y": [],
@@ -317,10 +318,31 @@ async function refreshAccessToken(req) {
   try {
     const response = await axios(authOptions);
     req.session.accessToken = response.data.access_token;
-    // req.session.refreshToken = response.data.refresh_token;      // wasn't working but i dont think this is needed 
+    req.session.tokenExpirationTime = Date.now() + (60 * 60 * 1000);  // 1 hour in milliseconds
+    // req.session.refreshToken = response.data.refresh_token;        // wasn't working but i dont think this is needed 
   } catch (error) {
     console.error('Error refreshing access token:', error);
   }
 }
 
-module.exports = { login, callback, topArtists, topSongs, profileInfo, test, ensureAuth };
+// check if current user is following other user(s)
+followCheck = function(req, res) {
+  const ids = req.query.ids;
+  var options = {
+    url: 'https://api.spotify.com/v1/me/following/contains?' +
+      querystring.stringify({
+        type: 'user',
+        ids: ids
+      }),
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + req.session.accessToken 
+    },
+    json: true 
+  };
+
+  request.get(options, async function(error, response, body) {   
+    res.json(body);
+  });
+}
+module.exports = { login, callback, topArtists, topSongs, profileInfo, test, ensureAuth, followCheck };

@@ -13,7 +13,11 @@ router.put('/updateArtists', databaseController.updateArtists);
 
 // router.put('/updateGenres', databaseController.updateGenres);
 
+router.put('/updateFollowing', databaseController.updateFollowing);
+
 router.put('/changePrivacy', databaseController.changePrivacy);
+
+router.get('/getAllUserIDs', databaseController.getAllUserIDs);
 
 
 module.exports = router;

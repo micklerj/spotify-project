@@ -22,17 +22,18 @@ function ProfilePage() {
   const [genreCount, setGenreCount] = useState(10);
   const [profilePic, setProfilePic] = useState('');
   const [userName, setUserName] = useState('');
-  const [ID, setID] = useState('');
+  const [userID, setUserID] = useState('');
   const [privacy, setPrivacy] = useState('');
 
-  // get profile pic, username, and ID
+  // get profile pic, username, and userID
   useEffect(() => {
     fetch('/api/profileInfo')
       .then(response => response.json())
       .then(data => {
         setProfilePic(data.images[1].url);
         setUserName(data.display_name);
-        setID(data.id);
+        setUserID(data.id);
+        console.log(data);
       })
       .catch((error) => { 
         console.error('Error:', error); 
@@ -41,8 +42,8 @@ function ProfilePage() {
 
   // get privacy setting
   useEffect(() => {
-    if (ID) {               // Make sure ID is not null
-      fetch(`/api/getUser?ID=${ID}`)
+    if (userID) {               // Make sure ID is not null
+      fetch(`/api/getUser?userID=${userID}`)
         .then(response => response.json())
         .then(data => {
           setPrivacy(data.privacy);
@@ -51,7 +52,7 @@ function ProfilePage() {
           console.error('Error:', error); 
         });
     }
-  }, [ID]);
+  }, [userID]);
 
   // default = top artists over last month   and load info into database
   useEffect(() => {
@@ -149,7 +150,7 @@ function ProfilePage() {
   // change privacy setting
   async function handleChangePrivacy() {
     const putData = {
-      "userID": ID,
+      "userID": userID,
       "privacy": privacy === 'Public' ? 'Private' : 'Public'
     };
 
