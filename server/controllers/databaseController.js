@@ -124,7 +124,7 @@ changePrivacy = async function(req, res) {
 }
 
 // update the user's list of followed users
-updateFollowing = async function(req, res) {
+addToFollowing = async function(req, res) {
   try {
     console.log(req.body);
 
@@ -140,6 +140,29 @@ updateFollowing = async function(req, res) {
     }
 
     // TODO: sort the list of users alphabetically
+
+    res.status(201).json(updatedUser);
+  }
+  catch (err){
+    console.log(err);
+  }
+}
+
+// update the user's list of followed users
+removeFromFollowing = async function(req, res) {
+  try {
+    console.log(req.body);
+
+    // Atomically find the user and remove from its list of following
+    const updatedUser = await user.findOneAndUpdate(
+      { userID: req.body.userID },
+      { $pull: { following: req.body.remove } },
+      { new: true, useFindAndModify: false }
+    );
+
+    if (!updatedUser) {
+      return res.status(400).json({ msg: 'user not found' });
+    }
 
     res.status(201).json(updatedUser);
   }
@@ -170,4 +193,4 @@ getAllUserIDs = async function(req, res) {
 }
 
 
-module.exports = { getUser, newUser, updateSongs, updateArtists, changePrivacy, updateFollowing, getAllUserIDs };
+module.exports = { getUser, newUser, updateSongs, updateArtists, changePrivacy, addToFollowing, removeFromFollowing, getAllUserIDs };

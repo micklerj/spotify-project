@@ -13,7 +13,9 @@ router.put('/updateArtists', databaseController.updateArtists);
 
 // router.put('/updateGenres', databaseController.updateGenres);
 
-router.put('/updateFollowing', databaseController.updateFollowing);
+router.put('/addToFollowing', databaseController.addToFollowing);
+
+router.put('/removeFromFollowing', databaseController.removeFromFollowing);
 
 router.put('/changePrivacy', databaseController.changePrivacy);
 

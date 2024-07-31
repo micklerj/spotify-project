@@ -20,5 +20,9 @@ router.get('/ensureAuth', spotifyController.ensureAuth);
 
 router.get('/followCheck', spotifyController.followCheck);
 
+router.get('/follow', spotifyController.follow);
+
+router.get('/unfollow', spotifyController.unfollow);
+
 
 module.exports = router;

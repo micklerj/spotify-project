@@ -3,8 +3,9 @@ import React, {useState, useEffect} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Container, Button, Row, Card, Navbar, Nav} from 'react-bootstrap';
 import axios from 'axios';
-// import axios from 'axios';
-
+import followingCheck from '../assets/followingCheck.png';
+import addFollowerIcon from '../assets/addFollowerIcon.png';
+import '../assets/styles.css';
 
 
 
@@ -20,6 +21,7 @@ function Following() {
     //   isFollowing: true,
     // }
   ]);
+  
 
 
   // get current userID
@@ -111,10 +113,10 @@ function Following() {
                   setuserIDList(prevList => [...prevList, ids[index]]);
                   // also add to DB
                   const putData = {
-                    "userID": userID,
-                    "follow": ids[index]
+                    "userID": userID,      // current user
+                    "follow": ids[index]   // followed user
                   };
-                  axios.put('/api/updateFollowing', putData)      
+                  axios.put('/api/addToFollowing', putData)      
                     .catch((error) => { 
                       console.error('Error:', error); 
                     });
@@ -129,6 +131,56 @@ function Following() {
       .catch((error) => { 
         console.error('Error:', error); 
       });
+  }
+
+  // toggle follow status of a user
+  async function handleToggleFollow(otherUserID, wasFollowing) {
+    // toggle isFollowing in followingList   (for follow button image)
+    setFollowingList(followingList.map(user => 
+      user.userID === otherUserID 
+        ? { ...user, isFollowing: !user.isFollowing } 
+        : user
+    ));
+
+    // remove or add to DB
+    if (wasFollowing) {
+      // remove 
+      const putData = {
+        "userID": userID,       // current user
+        "remove": otherUserID   // followed user
+      };
+      axios.put('/api/removeFromFollowing', putData)      
+        .catch((error) => { 
+          console.error('Error:', error); 
+        });
+    }
+    else {
+      // add
+      const putData = {
+        "userID": userID,       // current user
+        "follow": otherUserID   // followed user
+      };
+      axios.put('/api/addToFollowing', putData)      
+        .catch((error) => { 
+          console.error('Error:', error); 
+        });
+    }
+
+    // toggle follow with spotify api
+    if (wasFollowing) {
+      // unfollow
+      fetch(`/api/unfollow?id=${otherUserID}`)
+        .catch((error) => { 
+          console.error('Error:', error); 
+        });
+    }
+    else {
+      // follow
+      fetch(`/api/follow?id=${otherUserID}`)
+        .catch((error) => { 
+          console.error('Error:', error);
+        });
+    }
   }
 
   return (
@@ -151,7 +203,13 @@ function Following() {
                       <p style={{ marginTop: '0' }}>{user.recentlyListenedTo}</p>
                     </div>
                   </div>
-                  <Button variant="primary" style={{ width: '100px' }}>Unfollow</Button>
+                  <div className="image-container">
+                    <img 
+                      src={user.isFollowing ? followingCheck : addFollowerIcon} 
+                      alt="Button image" 
+                      onClick={() => handleToggleFollow(user.userID, user.isFollowing)}
+                    />
+                  </div>
                 </li>
               ))}
             </ol>

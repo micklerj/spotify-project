@@ -345,4 +345,48 @@ followCheck = function(req, res) {
     res.json(body);
   });
 }
-module.exports = { login, callback, topArtists, topSongs, profileInfo, test, ensureAuth, followCheck };
+
+// follow user on spotify
+follow = function(req, res) {
+  const id = req.query.id;
+  var options = {
+    url: 'https://api.spotify.com/v1/me/following?' +
+      querystring.stringify({
+        type: 'user',
+        ids: id
+      }),
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + req.session.accessToken 
+    },
+    json: true 
+  };
+
+  request.put(options, async function(error, response, body) {   
+    res.json({status: 'successfully followed user'});
+  });
+}
+
+// unfollow user on spotify
+unfollow = function(req, res) {
+  const id = req.query.id;
+  var options = {
+    url: 'https://api.spotify.com/v1/me/following?' +
+      querystring.stringify({
+        type: 'user',
+        ids: id
+      }),
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + req.session.accessToken 
+    },
+    json: true 
+  };
+
+  request.delete(options, async function(error, response, body) {   
+    res.json({status: 'successfully unfollowed user'});
+  });
+}
+
+
+module.exports = { login, callback, topArtists, topSongs, profileInfo, test, ensureAuth, followCheck, follow, unfollow };
