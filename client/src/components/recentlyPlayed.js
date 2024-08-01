@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import '../assets/styles.css';
+import './styles/recentlyPlayed.css';
 import musicNote from '../assets/musicNote.png';
 
 const DisplayRecentlyPlayed = ({ songTitle }) => {

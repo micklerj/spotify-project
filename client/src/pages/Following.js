@@ -5,7 +5,7 @@ import {Container, Button, Row, Card, Navbar, Nav} from 'react-bootstrap';
 import axios from 'axios';
 import followingCheck from '../assets/followingCheck.png';
 import addFollowerIcon from '../assets/addFollowerIcon.png';
-import '../assets/styles.css';
+import './styles/Following.css';
 import DisplayRecentlyPlayed from '../components/recentlyPlayed';
 
 
@@ -194,13 +194,13 @@ function Following() {
             <Card.Title style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               Following
             </Card.Title>
-            <ol style={{ display: 'grid', gap: '15px' }}>
+            <ol className="following-list">
               {followingList.map((user, index) => (
-                <li key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <img src={user.profilePic} alt="profile pic" style={{ width: '50px', height: '50px', borderRadius: '50%' }} />
-                    <div style={{ marginLeft: '10px' }}>
-                      <p style={{ marginBottom: '0' }}>{user.userName}</p>
+                <li key={index} className="following-item">
+                  <div className="following-item-content">
+                    <img src={user.profilePic} alt="profile pic" className="following-item-image" />
+                    <div className="following-item-info">
+                      <p>{user.userName}</p>
                       <DisplayRecentlyPlayed songTitle={user.recentlyListenedTo} />
                     </div>
                   </div>

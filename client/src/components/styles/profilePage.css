@@ -1,0 +1,101 @@
+.profile-container {
+  display: flex;
+  align-items: center;
+  margin-left: 50px;
+}
+
+.profile-image {
+  width: 200px;
+}
+
+.profile-info {
+  margin-left: 20px;
+}
+
+.align-right {
+  position: absolute;
+  right: 5%;
+}
+
+.image-container img {
+  width: 25px;
+  border-radius: 50%; /* makes the image a circle */
+  transition: opacity 0.2s ease-in-out; /* transition effect */
+}
+
+.image-container:hover img {
+  opacity: 0.5; /* makes the image darker on hover */
+}
+
+
+/* top artists list */
+.artist-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.artist-item {
+  display: flex;
+  align-items: center;
+}
+
+.artist-item-index {
+  margin-right: 10px;
+}
+
+.artist-item-content {
+  display: flex;
+  align-items: center;
+}
+
+.artist-item-image {
+  width: 50px;
+  margin-right: 10px;
+  border-radius: 50%;
+}
+
+.artist-item-link {
+  color: black;
+  text-decoration: none;
+}
+
+
+/* top songs list */
+.song-list {
+  list-style-type: none;
+}
+
+.song-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.song-item-content {
+  display: flex;
+  align-items: center;
+}
+
+.song-item-index {
+  margin-right: 2px;
+}
+
+.song-item-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  margin-left: 10px;
+}
+
+.song-item-link {
+  color: black;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.song-item-image {
+  width: 50px;
+  margin-right: 10px;
+}

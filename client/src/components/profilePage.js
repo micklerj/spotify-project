@@ -4,7 +4,7 @@ import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import privateIcon from '../assets/private.png';
 import publicIcon from '../assets/public.png';
-import '../assets/styles.css';
+import './styles/profilePage.css';
 import DisplayRecentlyPlayed from '../components/recentlyPlayed';
 
 
@@ -198,22 +198,22 @@ function ProfilePage() {
   return (
     <div>
       <Row bg="light" expand="lg" className="d-flex align-items-center">
-        <div style={{ display: 'flex', alignItems: 'center', marginLeft: '50px' }}>
-          <img src={profilePic} alt="Profile Picture" className="rounded-circle mr-2" style={{ width: "200px" }} />
+      <div className="profile-container">
+        <img src={profilePic} alt="Profile Picture" className="rounded-circle mr-2 profile-image" />
+        <div className="profile-info">
+          <h1>{userName}</h1>
           <div>
-            <h1 style={{ marginLeft: '20px' }}>{userName}</h1>
-            <div style={{ marginLeft: '20px' }}>
-              <DisplayRecentlyPlayed songTitle={recentlyPlayed} />
-            </div>
-          </div>
-          <div className="image-container align-right">
-            <img 
-              src={privacy === 'Public' ? publicIcon : privateIcon} 
-              alt="Button image" 
-              onClick={handleChangePrivacy}
-            />
+            <DisplayRecentlyPlayed songTitle={recentlyPlayed} />
           </div>
         </div>
+        <div className="image-container align-right">
+          <img 
+            src={privacy === 'Public' ? publicIcon : privateIcon} 
+            alt="Button image" 
+            onClick={handleChangePrivacy}
+          />
+        </div>
+      </div>
       </Row>
 
       <Container>
@@ -221,48 +221,48 @@ function ProfilePage() {
         <Row className="justify-content-center mt-4">
           <Card style={{ width: "400px" }}>
             <Card.Body>
-            <Card.Title style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              Top Artists
-              <div style={{ display: 'flex' }}>
-                <Button 
-                  variant="secondary" 
-                  style={{ borderRadius: '50%', width: '30px', height: '30px', marginLeft: '10px', fontSize: '10px', whiteSpace: 'nowrap' }}
-                  onClick={() => {
-                    handleTopArtists('short_term', 10);
-                    setArtistTimeFrame('short_term');
-                    setArtistCount(10);
-                  }}>
-                  1M
-                </Button>
-                <Button 
-                  variant="secondary" 
-                  style={{ borderRadius: '50%', width: '30px', height: '30px', marginLeft: '10px', fontSize: '10px', whiteSpace: 'nowrap' }}
-                  onClick={() => {
-                    handleTopArtists('medium_term', 10);
-                    setArtistTimeFrame('medium_term');
-                    setArtistCount(10);
-                  }}>
-                  6M
-                </Button>
-                <Button 
-                  variant="secondary" 
-                  style={{ borderRadius: '50%', width: '30px', height: '30px', marginLeft: '10px', fontSize: '10px', whiteSpace: 'nowrap' }}
-                  onClick={() => {
-                    handleTopArtists('long_term', 10);
-                    setArtistTimeFrame('long_term');
-                    setArtistCount(10);
-                  }}>
-                  1Y
-                </Button>
-              </div>
-            </Card.Title>
-              <ol style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '15px' }}>
+              <Card.Title style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                Top Artists
+                <div style={{ display: 'flex' }}>
+                  <Button 
+                    variant="secondary" 
+                    style={{ borderRadius: '50%', width: '30px', height: '30px', marginLeft: '10px', fontSize: '10px', whiteSpace: 'nowrap' }}
+                    onClick={() => {
+                      handleTopArtists('short_term', 10);
+                      setArtistTimeFrame('short_term');
+                      setArtistCount(10);
+                    }}>
+                    1M
+                  </Button>
+                  <Button 
+                    variant="secondary" 
+                    style={{ borderRadius: '50%', width: '30px', height: '30px', marginLeft: '10px', fontSize: '10px', whiteSpace: 'nowrap' }}
+                    onClick={() => {
+                      handleTopArtists('medium_term', 10);
+                      setArtistTimeFrame('medium_term');
+                      setArtistCount(10);
+                    }}>
+                    6M
+                  </Button>
+                  <Button 
+                    variant="secondary" 
+                    style={{ borderRadius: '50%', width: '30px', height: '30px', marginLeft: '10px', fontSize: '10px', whiteSpace: 'nowrap' }}
+                    onClick={() => {
+                      handleTopArtists('long_term', 10);
+                      setArtistTimeFrame('long_term');
+                      setArtistCount(10);
+                    }}>
+                    1Y
+                  </Button>
+                </div>
+              </Card.Title>
+              <ol className="artist-list">
                 {artists.map((artist, index) => (
-                  <li key={index} style={{ display: 'flex', alignItems: 'center' }}>
-                    <div style={{ marginRight: '10px' }}>{index + 1}</div>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <img src={artistPics[index]} alt={artist} style={{ width: '50px', marginRight: '10px', borderRadius: '50%' }} />
-                      <a href={artistURLs[index]} style={{ color: 'black', textDecoration: 'none'}}>{artist}</a>
+                  <li key={index} className="artist-item">
+                    <div className="artist-item-index">{index + 1}</div>
+                    <div className="artist-item-content">
+                      <img src={artistPics[index]} alt={artist} className="artist-item-image" />
+                      <a href={artistURLs[index]} className="artist-item-link">{artist}</a>
                     </div>
                   </li>
                 ))}
@@ -281,54 +281,52 @@ function ProfilePage() {
         <Row className="justify-content-center mt-4">
           <Card style={{ width: "400px" }}>
             <Card.Body>
-            <Card.Title style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              Top Songs
-              <div style={{ display: 'flex' }}>
-                <Button 
-                  variant="secondary" 
-                  style={{ borderRadius: '50%', width: '30px', height: '30px', marginLeft: '10px', fontSize: '10px', whiteSpace: 'nowrap' }}
-                  onClick={() => {
-                    handleTopSongs('short_term', 10);
-                    setSongTimeFrame('short_term');
-                    setSongCount(10);
-                  }}>
-                  1M
-                </Button>
-                <Button 
-                  variant="secondary" 
-                  style={{ borderRadius: '50%', width: '30px', height: '30px', marginLeft: '10px', fontSize: '10px', whiteSpace: 'nowrap' }}
-                  onClick={() => {
-                    handleTopSongs('medium_term', 10);
-                    setSongTimeFrame('medium_term');
-                    setSongCount(10);
-                  }}>
-                  6M
-                </Button>
-                <Button 
-                  variant="secondary" 
-                  style={{ borderRadius: '50%', width: '30px', height: '30px', marginLeft: '10px', fontSize: '10px', whiteSpace: 'nowrap' }}
-                  onClick={() => {
-                    handleTopSongs('long_term', 10);
-                    setSongTimeFrame('long_term');
-                    setSongCount(10);
-                  }}>
-                  1Y
-                </Button>
-              </div>
-            </Card.Title>
-              <ol style={{ listStyleType: 'none' }}>
+              <Card.Title style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                Top Songs
+                <div style={{ display: 'flex' }}>
+                  <Button 
+                    variant="secondary" 
+                    style={{ borderRadius: '50%', width: '30px', height: '30px', marginLeft: '10px', fontSize: '10px', whiteSpace: 'nowrap' }}
+                    onClick={() => {
+                      handleTopSongs('short_term', 10);
+                      setSongTimeFrame('short_term');
+                      setSongCount(10);
+                    }}>
+                    1M
+                  </Button>
+                  <Button 
+                    variant="secondary" 
+                    style={{ borderRadius: '50%', width: '30px', height: '30px', marginLeft: '10px', fontSize: '10px', whiteSpace: 'nowrap' }}
+                    onClick={() => {
+                      handleTopSongs('medium_term', 10);
+                      setSongTimeFrame('medium_term');
+                      setSongCount(10);
+                    }}>
+                    6M
+                  </Button>
+                  <Button 
+                    variant="secondary" 
+                    style={{ borderRadius: '50%', width: '30px', height: '30px', marginLeft: '10px', fontSize: '10px', whiteSpace: 'nowrap' }}
+                    onClick={() => {
+                      handleTopSongs('long_term', 10);
+                      setSongTimeFrame('long_term');
+                      setSongCount(10);
+                    }}>
+                    1Y
+                  </Button>
+                </div>
+              </Card.Title>
+              <ol className="song-list">
                 {songs.map((song, index) => (
-                  <li key={index}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <div>{index + 1}</div>
-                        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginLeft: '10px' }}>
-                          <a href={songURLs[index]} style={{ color: 'black', textDecoration: 'none', fontWeight: 'bold' }}>{song}</a>
-                          <div>{songSingers[index]}</div>
-                        </div>
+                  <li key={index} className="song-item">
+                    <div className="song-item-content">
+                      <div className="song-item-index">{index + 1}</div>
+                      <div className="song-item-info">
+                        <a href={songURLs[index]} className="song-item-link">{song}</a>
+                        <div>{songSingers[index]}</div>
                       </div>
-                      <img src={songPics[index]} style={{ width: '50px', marginRight: '10px' }} />
                     </div>
+                    <img src={songPics[index]} className="song-item-image" />
                   </li>
                 ))}
               </ol>

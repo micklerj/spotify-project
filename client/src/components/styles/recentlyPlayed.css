@@ -1,0 +1,18 @@
+.song-title-container {
+  margin-left: 5px;
+  width: 200px;
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+  /* text-align: center; */
+}
+
+.title-wrapper {
+  display: block;
+  box-sizing: content-box;
+}
+
+.title {
+  white-space: nowrap;
+  font-size: 14px;
+}

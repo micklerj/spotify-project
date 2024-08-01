@@ -1,6 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Button, Navbar, Nav} from 'react-bootstrap';
 import { useLocation } from 'react-router-dom';
+import './styles/footerButtons.css';
 
 
 
@@ -13,23 +14,23 @@ function Footer() {
 
   return (
     <div className="header">
-      <Navbar fixed="bottom" bg="light" className="justify-content-center">
-        <Nav.Item>
-          <Nav.Link href="/home" onClick={(e) => isHome && e.preventDefault()}>
-            <Button variant="secondary" style={{ borderRadius: '50%', width: '30px', height: '30px', marginLeft: '10px', fontSize: '10px', whiteSpace: 'nowrap' }}>1</Button>
-          </Nav.Link>
-        </Nav.Item>
-        <Nav.Item>
-        <Nav.Link href="/following" onClick={(e) => isFollowing && e.preventDefault()}>
-            <Button variant="secondary" style={{ borderRadius: '50%', width: '30px', height: '30px', marginLeft: '10px', fontSize: '10px', whiteSpace: 'nowrap' }}>2</Button>
-          </Nav.Link>
-        </Nav.Item>
-        <Nav.Item>
-        <Nav.Link href="/explore" onClick={(e) => isExplore && e.preventDefault()}>
-            <Button variant="secondary" style={{ borderRadius: '50%', width: '30px', height: '30px', marginLeft: '10px', fontSize: '10px', whiteSpace: 'nowrap' }}>3</Button>
-          </Nav.Link>
-        </Nav.Item>
-      </Navbar>
+      <div className="navbar">
+        <div className="nav-item">
+          <a href="/home" className="nav-link" onClick={(event) => {if(isHome) event.preventDefault();}}>
+            <button className="button round-button">1</button>
+          </a>
+        </div>
+        <div className="nav-item">
+          <a href="/following" className="nav-link" onClick={(event) => {if(isFollowing) event.preventDefault();}}>
+            <button className="button round-button">2</button>
+          </a>
+        </div>
+        <div className="nav-item">
+          <a href="/explore" className="nav-link" onClick={(event) => {if(isExplore) event.preventDefault();}}>
+            <button className="button round-button">3</button>
+          </a>
+        </div>
+      </div>
     </div>
   );
 }

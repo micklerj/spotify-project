@@ -1,0 +1,40 @@
+
+.following-list {
+  display: grid;
+  gap: 15px;
+}
+
+.following-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.following-item-content {
+  display: flex;
+  align-items: center;
+}
+
+.following-item-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+.following-item-info {
+  margin-left: 10px;
+}
+
+.following-item-info p {
+  margin-bottom: 0;
+}
+
+.image-container img {
+  width: 25px;
+  border-radius: 50%; /* makes the image a circle */
+  transition: opacity 0.2s ease-in-out; /* transition effect */
+}
+
+.image-container:hover img {
+  opacity: 0.5; /* makes the image darker on hover */
+}
