@@ -2,7 +2,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import {Container, Button, Row, Card, Navbar, Nav} from 'react-bootstrap';
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
-
+import privateIcon from '../assets/private.png';
+import publicIcon from '../assets/public.png';
+import '../assets/styles.css';
+import DisplayRecentlyPlayed from '../components/recentlyPlayed';
 
 
 function ProfilePage() {
@@ -24,6 +27,7 @@ function ProfilePage() {
   const [userName, setUserName] = useState('');
   const [userID, setUserID] = useState('');
   const [privacy, setPrivacy] = useState('');
+  const [recentlyPlayed, setRecentlyPlayed] = useState([]);
 
   // get profile pic, username, and userID
   useEffect(() => {
@@ -47,6 +51,31 @@ function ProfilePage() {
         .then(response => response.json())
         .then(data => {
           setPrivacy(data.privacy);
+        })
+        .catch((error) => { 
+          console.error('Error:', error); 
+        });
+    }
+  }, [userID]);
+
+  // get recently played song
+  useEffect(() => {
+    if (userID) {
+      fetch(`/api/getRecentlyPlayed`)
+        .then(response => response.json())
+        .then(data => {
+          const songNArtist = data.items[0].track.name + ' ~ ' + data.items[0].track.artists[0].name;
+          setRecentlyPlayed(songNArtist);
+          console.log("recent songs: ", data);
+          // update DB
+          const putData = {
+            "userID": userID,
+            "recentlyPlayed": songNArtist
+          }  
+          axios.put('http://localhost:3500/api/updateUser', putData)
+            .catch((error) => { 
+              console.error('Error:', error);
+            })
         })
         .catch((error) => { 
           console.error('Error:', error); 
@@ -171,9 +200,19 @@ function ProfilePage() {
       <Row bg="light" expand="lg" className="d-flex align-items-center">
         <div style={{ display: 'flex', alignItems: 'center', marginLeft: '50px' }}>
           <img src={profilePic} alt="Profile Picture" className="rounded-circle mr-2" style={{ width: "200px" }} />
-          <h1 style={{ marginLeft: '20px' }}>{userName}</h1>
-          <h2 style={{ marginLeft: '20px' }}>{privacy}</h2>
-          <Button variant="secondary" style={{ marginLeft: '20px' }} onClick={handleChangePrivacy}>Change Privacy</Button>
+          <div>
+            <h1 style={{ marginLeft: '20px' }}>{userName}</h1>
+            <div style={{ marginLeft: '20px' }}>
+              <DisplayRecentlyPlayed songTitle={recentlyPlayed} />
+            </div>
+          </div>
+          <div className="image-container align-right">
+            <img 
+              src={privacy === 'Public' ? publicIcon : privateIcon} 
+              alt="Button image" 
+              onClick={handleChangePrivacy}
+            />
+          </div>
         </div>
       </Row>
 

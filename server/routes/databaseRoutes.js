@@ -7,9 +7,7 @@ router.get('/getUser', databaseController.getUser);
 
 router.post('/newUser', databaseController.newUser);
 
-router.put('/updateSongs', databaseController.updateSongs);
-
-router.put('/updateArtists', databaseController.updateArtists);
+router.put('/updateUser', databaseController.updateUser);
 
 // router.put('/updateGenres', databaseController.updateGenres);
 

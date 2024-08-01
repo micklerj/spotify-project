@@ -6,6 +6,7 @@ import axios from 'axios';
 import followingCheck from '../assets/followingCheck.png';
 import addFollowerIcon from '../assets/addFollowerIcon.png';
 import '../assets/styles.css';
+import DisplayRecentlyPlayed from '../components/recentlyPlayed';
 
 
 
@@ -64,8 +65,8 @@ function Following() {
                   userID: userID,
                   profilePic: data.profilePic,
                   userName: data.username,
-                  recentlyListenedTo: "some song name",    // TODO: replace with actual song name
-                  isFollowing: true,                       // TODO: replace with actual following status
+                  recentlyListenedTo: data.recentlyPlayed,
+                  isFollowing: true,                       
                 }
               ]);
             })
@@ -200,7 +201,7 @@ function Following() {
                     <img src={user.profilePic} alt="profile pic" style={{ width: '50px', height: '50px', borderRadius: '50%' }} />
                     <div style={{ marginLeft: '10px' }}>
                       <p style={{ marginBottom: '0' }}>{user.userName}</p>
-                      <p style={{ marginTop: '0' }}>{user.recentlyListenedTo}</p>
+                      <DisplayRecentlyPlayed songTitle={user.recentlyListenedTo} />
                     </div>
                   </div>
                   <div className="image-container">

@@ -93,6 +93,7 @@ callback = function(req, res) {
               "profilePic": body.images[1].url,
               "userID": body.id,
               "privacy": "Public",
+              "recentlyPlayed": "",
               "following": [],
               "topArtists1M": [],
               "topArtists6M": [],
@@ -169,7 +170,7 @@ topArtists = function(req, res) {
         [topArtistsTime]: artistArray
       }
 
-      axios.put('http://localhost:3500/api/updateArtists', putData)
+      axios.put('http://localhost:3500/api/updateUser', putData)
         .catch((error) => { 
           console.error('Error:', error);
         })
@@ -223,7 +224,7 @@ topSongs = function(req, res) {
         [topSongsTime]: songArray
       }
 
-      axios.put('http://localhost:3500/api/updateSongs', putData)
+      axios.put('http://localhost:3500/api/updateUser', putData)
         .catch((error) => { 
           console.error('Error:', error);
         })
@@ -388,5 +389,24 @@ unfollow = function(req, res) {
   });
 }
 
+// get recently played songs
+// note: this spotify endpoint sucks and isn't the most recent song played
+getRecentlyPlayed = function(req, res) {
+  var options = {
+    url: 'https://api.spotify.com/v1/me/player/recently-played?' +
+    querystring.stringify({
+      limit: 1
+    }),
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + req.session.accessToken 
+    },
+    json: true 
+  };
 
-module.exports = { login, callback, topArtists, topSongs, profileInfo, test, ensureAuth, followCheck, follow, unfollow };
+  request.get(options, async function(error, response, body) {   
+    res.json(body);
+  });
+}
+
+module.exports = { login, callback, topArtists, topSongs, profileInfo, test, ensureAuth, followCheck, follow, unfollow, getRecentlyPlayed };

@@ -24,5 +24,7 @@ router.get('/follow', spotifyController.follow);
 
 router.get('/unfollow', spotifyController.unfollow);
 
+router.get('/getRecentlyPlayed', spotifyController.getRecentlyPlayed);
+
 
 module.exports = router;

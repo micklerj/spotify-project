@@ -40,9 +40,10 @@ newUser = async function(req, res) {
   }
 }
 
-// update the user's list of top artists
-updateArtists = async function(req, res) {
+// update the user's list of top artists, top songs, or recently played song 
+updateUser = async function(req, res) {
   try {
+    console.log(req.body);
     // Prepare the update object
     let update = {};
     for (let key in req.body) {
@@ -68,37 +69,6 @@ updateArtists = async function(req, res) {
     console.log(err);
   }
 }
-
-// update the user's list of top songs
-updateSongs = async function(req, res) {
-  try {
-    // Prepare the update object
-    let update = {};
-    for (let key in req.body) {
-      if (key !== 'userID') {
-        update[key] = req.body[key];
-      }
-    }
-
-    // Atomically find the user and update it
-    const updatedUser = await user.findOneAndUpdate(
-      { userID: req.body.userID },
-      { $set: update },
-      { new: true, useFindAndModify: false }
-    );
-
-    if (!updatedUser) {
-      return res.status(400).json({ msg: 'user not found' });
-    }
-
-    res.status(201).json(updatedUser);
-  }
-  catch (err){
-    console.log(err);
-  }
-}
-// TODO: possibly combine these functions into 1 since the code is the same^^
-
 
 // toggle privacy setting
 changePrivacy = async function(req, res) {
@@ -193,4 +163,4 @@ getAllUserIDs = async function(req, res) {
 }
 
 
-module.exports = { getUser, newUser, updateSongs, updateArtists, changePrivacy, addToFollowing, removeFromFollowing, getAllUserIDs };
+module.exports = { getUser, newUser, updateUser, changePrivacy, addToFollowing, removeFromFollowing, getAllUserIDs };
