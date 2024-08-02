@@ -53,29 +53,28 @@ function Following() {
 
   // get the profiles of the users in the following list
   useEffect(() => {
-    if (userIDList) {                      // Make sure followingList is not null
-      userIDList.forEach((userID) => {
-        if (!followingList.some(user => user.userID === userID)) {   // Make sure user is not already in followingList
-          fetch(`/api/getUser?userID=${userID}`)
-            .then(response => response.json())
-            .then(data => {
-              setFollowingList(prevFollowingList => [
-                ...prevFollowingList,
-                {
-                  userID: userID,
-                  profilePic: data.profilePic,
-                  userName: data.username,
-                  recentlyListenedTo: data.recentlyPlayed,
-                  isFollowing: true,                       
-                }
-              ]);
-            })
-            .catch((error) => { 
-              console.error('Error:', error); 
-            });
-        }
-      });
-    }
+    userIDList.forEach((userID) => {
+      if (!followingList.some(user => user.userID === userID)) {   // Make sure user is not already in followingList
+        fetch(`/api/getUser?userID=${userID}`)
+          .then(response => response.json())
+          .then(data => {
+            setFollowingList(prevFollowingList => [
+              ...prevFollowingList,
+              {
+                userID: userID,
+                profilePic: data.profilePic,
+                userName: data.username,
+                recentlyListenedTo: data.recentlyPlayed,
+                isFollowing: true,                       
+              }
+            ]);
+          })
+          .catch((error) => { 
+            console.error('Error:', error); 
+          });
+      }
+    });
+    
   }, [userIDList]);
 
 
@@ -88,7 +87,7 @@ function Following() {
       .then(data => {
         data.userIDs.forEach((id) => {
           if (!userIDList.includes(id) && id !== userID) {
-            // add userIDs to a string
+            // add userIDs to a string in idStrings[]  (spotify endpoint for followCheck only accepts 50 ids at a time)
             if (count === 50) {
               idStrings.push('');
               count = 0;

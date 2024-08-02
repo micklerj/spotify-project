@@ -43,7 +43,6 @@ newUser = async function(req, res) {
 // update the user's list of top artists, top songs, or recently played song 
 updateUser = async function(req, res) {
   try {
-    console.log(req.body);
     // Prepare the update object
     let update = {};
     for (let key in req.body) {
@@ -141,20 +140,24 @@ removeFromFollowing = async function(req, res) {
   }
 }
 
-// iterate through every user in DB
+// get some range of userIDs from DB
 getAllUserIDs = async function(req, res) {
+  // range of users to get from DB
+  const start = parseInt(req.query.start) || 0;
+  const limit = parseInt(req.query.limit) || Number.MAX_SAFE_INTEGER;
+
   try {
-    const allUsers = await user.find();
-    if (!allUsers) {
+    const Users = await user.find().skip(start).limit(limit);
+    if (!Users) {
       return res.status(404).json({ message: 'No users found' });
     }
 
-    var allUserIDs = [];
-    allUsers.forEach((user) => {
-      allUserIDs.push(user.userID);
+    var UserIDs = [];
+    Users.forEach((user) => {
+      UserIDs.push(user.userID);
     });
 
-    return res.json({ userIDs: allUserIDs });
+    return res.json({ userIDs: UserIDs });
   }
   catch (err){
     console.log(err);
