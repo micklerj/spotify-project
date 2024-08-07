@@ -1,5 +1,5 @@
 import Footer from '../components/footerButtons';
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Container, Button, Row, Card, Navbar, Nav} from 'react-bootstrap';
 import axios from 'axios';
@@ -12,7 +12,7 @@ import DisplayRecentlyPlayed from '../components/recentlyPlayed';
 
 function Following() {
   const [userID, setUserID] = useState('');               // current user's ID
-  const [userIDList, setuserIDList] = useState([]);       // list of IDs of users that current user follows
+  const [userIDList, setuserIDList] = useState(null);       // list of IDs of users that current user follows
   const [followingList, setFollowingList] = useState([
     // {
     //   userID: '',
@@ -22,7 +22,8 @@ function Following() {
     //   isFollowing: true,
     // }
   ]);
-  
+  const hasRun = useRef(false);
+
 
 
   // get current userID
@@ -39,25 +40,27 @@ function Following() {
 
   // first add current user's following list from DB
   useEffect(() => {
-    if (userID) {               // Make sure ID is not null
-      fetch(`/api/getUser?userID=${userID}`)
-        .then(response => response.json())
-        .then(data => {
-          setuserIDList(data.following);
-        })
-        .catch((error) => { 
-          console.error('Error:', error); 
-        });
-    }
+    if (!userID) return;               // Make sure ID is not null
+    fetch(`/api/getUser?userID=${userID}`)
+      .then(response => response.json())
+      .then(data => {
+        setuserIDList(data.following);
+      })
+      .catch((error) => { 
+        console.error('Error:', error); 
+      });
+    
   }, [userID]);
 
   // get the profiles of the users in the following list
   useEffect(() => {
-    userIDList.forEach((userID) => {
-      if (!followingList.some(user => user.userID === userID)) {   // Make sure user is not already in followingList
-        fetch(`/api/getUser?userID=${userID}`)
-          .then(response => response.json())
-          .then(data => {
+    if (!userIDList) return;      // Make sure list is not null
+    const fetchUsers = async () => {
+      for (const userID of userIDList) {
+        if (!followingList.some(user => user.userID === userID)) {   // Make sure user is not already in followingList
+          try {
+            const response = await fetch(`/api/getUser?userID=${userID}`);
+            const data = await response.json();
             setFollowingList(prevFollowingList => [
               ...prevFollowingList,
               {
@@ -68,12 +71,20 @@ function Following() {
                 isFollowing: true,                       
               }
             ]);
-          })
-          .catch((error) => { 
-            console.error('Error:', error); 
-          });
+          } catch (error) {
+            console.error('Error:', error);
+          }
+        }
       }
-    });
+  
+      if (!hasRun.current) {
+        // search the DB for other users that current user follows that hasnt been added to the current user's DB object yet
+        getOtherFollowedUsers();  
+        hasRun.current = true;
+      }
+    };
+  
+    fetchUsers();
     
   }, [userIDList]);
 
@@ -132,6 +143,8 @@ function Following() {
         console.error('Error:', error); 
       });
   }
+  
+  //TODO: if # of users grows large enough, implement InfiniteScroll and change how additional followed users are retrieved  
 
   // toggle follow status of a user
   async function handleToggleFollow(otherUserID, wasFollowing) {
@@ -203,7 +216,7 @@ function Following() {
                       <DisplayRecentlyPlayed songTitle={user.recentlyListenedTo} />
                     </div>
                   </div>
-                  <div className="image-container">
+                  <div className="follow-image-container">
                     <img 
                       src={user.isFollowing ? followingCheck : addFollowerIcon} 
                       alt="Button image" 
@@ -217,11 +230,6 @@ function Following() {
         </Card>
       </div>
 
-      <div>
-        <Button variant="primary" style={{ width: '100px' }} onClick={getOtherFollowedUsers}>
-          add other followed users
-        </Button>
-      </div>
 
       <Footer />
     </div>    

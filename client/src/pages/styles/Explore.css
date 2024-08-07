@@ -1,0 +1,54 @@
+.search-bar {
+  display: flex;
+  align-items: center;
+  border: 1px solid #000;
+  border-radius: 50px;
+  overflow: hidden;
+  margin: auto;
+  max-width: 90%;
+  padding: 1px;
+}
+
+.search-bar img {
+  margin-right: 10px;
+  margin-left: 10px;
+  width: 15px;
+}
+
+.search-bar input {
+  flex: 1;
+  border: none;
+  outline: none;
+}
+
+.search-bar button {
+  border: 0;
+  background-color: white;
+  border-radius: 50%;
+  width: 25px;  
+  height: 25px;
+  padding: 5px;
+  margin: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.search-bar button img {
+  width: 15px;
+  transition: opacity 0.2s ease-in-out; /* transition effect */
+}
+
+.search-bar button:hover img {
+  opacity: 0.6; /* makes the image darker on hover */
+}
+
+.follow-image-container img {
+  width: 25px;
+  border-radius: 50%; /* makes the image a circle */
+  transition: opacity 0.2s ease-in-out; /* transition effect */
+}
+
+.follow-image-container:hover img {
+  opacity: 0.5; /* makes the image darker on hover */
+} 

@@ -19,5 +19,7 @@ router.put('/changePrivacy', databaseController.changePrivacy);
 
 router.get('/getAllUserIDs', databaseController.getAllUserIDs);
 
+router.get('/searchUsers', databaseController.searchUsers);
+
 
 module.exports = router;

@@ -6,6 +6,9 @@ import axios from 'axios';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import followingCheck from '../assets/followingCheck.png';
 import addFollowerIcon from '../assets/addFollowerIcon.png';
+import magnifyingGlass from '../assets/magnifyingGlass.png';
+import x from '../assets/x.png';
+import submit from '../assets/submit.png';
 import './styles/Explore.css';
 import DisplayRecentlyPlayed from '../components/recentlyPlayed';
 
@@ -24,6 +27,10 @@ function Explore() {
     // }
   ]);
   const [DBindex, setDBindex] = useState(0);
+  const [searchInput, setSearchInput] = useState('');
+  const [inputHandled, setInputHandled] = useState(false);
+  const [initialListLoaded, setInitialListLoaded] = useState(false);
+
 
   
 
@@ -54,49 +61,72 @@ function Explore() {
     }
   }, [userID]);
 
-  // get initial list of userIDs to display
+  // get initial list of userIDs to display once followedUserIDList is populated
   useEffect(() => {
-    if (followedUserIDList.length > 0) {
-      getDisplayUsers();
+    if (followedUserIDList.length > 0 && !initialListLoaded) {
+      getDisplayUsers(0);
+      setInitialListLoaded(true);
     }
   }, [followedUserIDList]);
 
   // get the profiles of the users in the display list
   useEffect(() => {
-    userIDList.forEach((userID) => {
+    // userIDList.forEach((userID) => {          // ----------- this version does not retain the order ------------
+    //   if (!displayList.some(user => user.userID === userID)) {   
+    //     fetch(`/api/getUser?userID=${userID}`)
+    //       .then(response => response.json())
+    //       .then(data => {
+    //         setDisplayList(prevDisplayList => [
+    //           ...prevDisplayList,
+    //           {
+    //             userID: userID,
+    //             profilePic: data.profilePic,
+    //             userName: data.username,
+    //             recentlyListenedTo: data.recentlyPlayed,
+    //             isFollowing: false,                       
+    //           }
+    //         ]);
+    //       })
+    //       .catch((error) => { 
+    //         console.error('Error:', error); 
+    //       });
+    //   }
+    // });
+    
+    const fetchUsers = userIDList.map(userID => {
       if (!displayList.some(user => user.userID === userID)) {   // Make sure user is not already in displayList
-        fetch(`/api/getUser?userID=${userID}`)
+        return fetch(`/api/getUser?userID=${userID}`)
           .then(response => response.json())
-          .then(data => {
-            setDisplayList(prevDisplayList => [
-              ...prevDisplayList,
-              {
-                userID: userID,
-                profilePic: data.profilePic,
-                userName: data.username,
-                recentlyListenedTo: data.recentlyPlayed,
-                isFollowing: false,                       
-              }
-            ]);
-          })
+          .then(data => ({
+            userID: userID,
+            profilePic: data.profilePic,
+            userName: data.username,
+            recentlyListenedTo: data.recentlyPlayed,
+            isFollowing: followedUserIDList.includes(userID),  // Check if userID is followed or not
+          }))
           .catch((error) => { 
             console.error('Error:', error); 
           });
       }
     });
+  
+    Promise.all(fetchUsers)
+      .then(users => {
+        setDisplayList(prevDisplayList => [...prevDisplayList, ...users.filter(Boolean)]);
+      });
     
   }, [userIDList]);
 
-  // get 20 of userIDs that the user does not follow at a time
-  async function getDisplayUsers() {
+  // get at most 15 of userIDs that the user does not follow at a time
+  async function getDisplayUsers(DBStartIndex) {
     let idStrings = [''];
     let count = 0;
-    const limit = 20;
-    fetch(`/api/getAllUserIDs?start=${DBindex}&limit=${limit}`)
+    const limit = 15;
+    fetch(`/api/getAllUserIDs?start=${DBStartIndex}&limit=${limit}`)
       .then(response => response.json())
       .then(data => {
         // increment DB index
-        setDBindex(DBindex + limit);
+        setDBindex(DBStartIndex + limit);
 
         data.userIDs.forEach((id) => {
           if (!followedUserIDList.includes(id) && id !== userID) {
@@ -200,25 +230,92 @@ function Explore() {
           console.error('Error:', error);
         });
     }
+
+    // update followedUserIDList
+    if (wasFollowing) {
+      setFollowedUserIDList(followedUserIDList.filter(id => id !== otherUserID));
+    }
+    else {
+      setFollowedUserIDList([...followedUserIDList, otherUserID]);
+    }
+  }
+
+  async function handleInput() {
+    console.log(searchInput);
+    // clear current userID and display list
+    setuserIDList([]);
+    setDisplayList([]);
+
+    if (searchInput === '') {
+      getDisplayUsers(0);   // gets default users
+    }
+    else {
+      setInputHandled(true);
+      try {
+        const getData = {
+          "query": searchInput,       // search query
+        };
+        const response = await axios.get(`/api/searchUsers?query=${searchInput}`, getData);   
+        const users = response.data;      
+        console.log(users);      
+        // Add each userID from users to userIDList
+        let userIDList = [];
+        users.forEach(user => {
+          userIDList.push(user.userID);
+        });
+        setuserIDList(userIDList);
+
+      } catch (error) {
+        console.error(error);
+      }   
+    } 
+  }
+
+  // clear the search input and get default users
+  async function handleClearInput() {
+    setInputHandled(false);
+    setSearchInput('');
+    setuserIDList([]);
+    setDisplayList([]);
+
+    getDisplayUsers(0);
   }
 
   return (
     <div className="explore page">
       <h1>  Explore Page </h1>
 
+      <div className="search-bar">
+        <img src={magnifyingGlass} alt="Search" />
+        <input
+          type="text"
+          value={searchInput}
+          onChange={e => {
+            setSearchInput(e.target.value);
+            setInputHandled(false);
+          }}
+          onKeyPress={e => {
+            if (e.key === 'Enter') {
+              handleInput(); 
+            }
+          }}
+          placeholder="Search"
+        />
+        <button onClick={inputHandled ? handleClearInput : handleInput} className="search-bar-button">
+          <img src={inputHandled ? x : submit} alt="Submit" />
+        </button>
+      </div>
+
       <div >
         <InfiniteScroll
           dataLength={displayList.length}
-          next={getDisplayUsers}
+          next={() => getDisplayUsers(DBindex)}
           hasMore={true}
           loader={<h4>Loading...</h4>}
         >
           <div>
             <Card style={{ width: "400px" }}>
               <Card.Body>
-                <Card.Title style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  Exploring
-                </Card.Title>
                 <ol className="following-list">
                   {displayList.map((user, index) => (
                     <li key={index} className="following-item">
@@ -229,12 +326,14 @@ function Explore() {
                           <DisplayRecentlyPlayed songTitle={user.recentlyListenedTo} />
                         </div>
                       </div>
-                      <div className="image-container">
-                        <img 
-                          src={user.isFollowing ? followingCheck : addFollowerIcon} 
-                          alt="Button image" 
-                          onClick={() => handleToggleFollow(user.userID, user.isFollowing)}
-                        />
+                      <div className="follow-image-container">
+                        {user.userID !== userID && (
+                          <img 
+                            src={user.isFollowing ? followingCheck : addFollowerIcon} 
+                            alt="Button image" 
+                            onClick={() => handleToggleFollow(user.userID, user.isFollowing)}
+                          />
+                        )}
                       </div>
                     </li>
                   ))}

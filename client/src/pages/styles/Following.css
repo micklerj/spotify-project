@@ -29,12 +29,12 @@
   margin-bottom: 0;
 }
 
-.image-container img {
+.follow-image-container img {
   width: 25px;
   border-radius: 50%; /* makes the image a circle */
   transition: opacity 0.2s ease-in-out; /* transition effect */
 }
 
-.image-container:hover img {
+.follow-image-container:hover img {
   opacity: 0.5; /* makes the image darker on hover */
-}
+} 

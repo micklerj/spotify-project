@@ -1,5 +1,6 @@
 const user = require('../model/user');
 
+
 // get user based on userID
 getUser = async function(req, res) {
   var userID = req.query.userID || null;
@@ -165,5 +166,44 @@ getAllUserIDs = async function(req, res) {
 
 }
 
+// search for most relavent users
+searchUsers = async function(req, res) {
 
-module.exports = { getUser, newUser, updateUser, changePrivacy, addToFollowing, removeFromFollowing, getAllUserIDs };
+  const searchQuery = req.query.query;
+  console.log("search input: ", searchQuery);
+
+  if (!searchQuery) {
+    res.json([])
+    return
+  }
+
+  const pipeline = []
+
+  pipeline.push({
+    $search: {
+      index: 'user_search', 
+      text: {
+        query: searchQuery,
+        path: ['username', 'userID'],
+        fuzzy: {}
+      },          
+    },
+  })  
+
+  pipeline.push({
+    $project: {
+      _id: 0,
+      score: {$meta: 'searchScore'},
+      // username: 1, 
+      userID: 1, 
+      // profilePic: 1, 
+      // privacy: 1, 
+      // recentlyPlayed: 1, 
+    },
+  })
+
+  const result = await user.aggregate(pipeline).sort({score: -1}).limit(10)
+  res.json(result)
+}
+
+module.exports = { getUser, newUser, updateUser, changePrivacy, addToFollowing, removeFromFollowing, getAllUserIDs, searchUsers };
