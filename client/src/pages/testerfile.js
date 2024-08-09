@@ -6,7 +6,7 @@ import Header from '../components/header';
 const CLIENT_ID = '9b655af69eb243c98069a6c4965afc16'
 const CLIENT_SECRET = '15de6297eacb4dcb968f9930725f8bf5'
 
-function Home() {
+function Profile() {
   const [artist, setArtist] = useState("");
   const [accessToken, setAccessToken] = useState("");
   const [albums, setAlbums] = useState([]);
@@ -119,4 +119,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default Profile;

@@ -8,7 +8,7 @@ import './styles/profilePage.css';
 import DisplayRecentlyPlayed from '../components/recentlyPlayed';
 
 
-function ProfilePage() {
+function ProfilePage({displayedUserID}) {
   const [artists, setArtists] = useState([]);
   const [artistURLs, setArtistURLs] = useState([]);
   const [artistPics, setArtistPics] = useState([]);
@@ -28,25 +28,58 @@ function ProfilePage() {
   const [userID, setUserID] = useState('');
   const [privacy, setPrivacy] = useState('');
   const [recentlyPlayed, setRecentlyPlayed] = useState([]);
+  const [otherUserIsDisplayed, setOtherUserIsDisplayed] = useState(false);
 
-  // get profile pic, username, and userID
+  // get profile pic, username, and userID    and   update DB if neccisary 
   useEffect(() => {
-    fetch('/api/profileInfo')
-      .then(response => response.json())
-      .then(data => {
-        setProfilePic(data.images[1].url);
-        setUserName(data.display_name);
-        setUserID(data.id);
-        console.log(data);
-      })
-      .catch((error) => { 
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/profileInfo');
+        const data = await response.json();        
+  
+        if (displayedUserID === undefined || displayedUserID === data.id) {  
+          setUserID(data.id); 
+          setProfilePic(data.images[1].url);
+          setUserName(data.display_name);
+          console.log(data);
+  
+          // update profile info in DB if necessary
+          const putData = {
+            "userID": data.id,
+            "username": data.display_name,
+            "profilePic": data.images[1].url,
+          }  
+          try {
+            await axios.put('http://localhost:3500/api/updateUser', putData);
+          } catch (error) { 
+            console.error('Error:', error);
+          }
+        }
+        else {
+          // display user is not the logged in user, get profile from DB   and recently played and privacy
+          setOtherUserIsDisplayed(true);
+          try {
+            const otherUserResponse = await fetch(`/api/getUser?userID=${displayedUserID}`);
+            const otherUserData = await otherUserResponse.json();
+            setProfilePic(otherUserData.profilePic);
+            setUserName(otherUserData.username);
+            setRecentlyPlayed(otherUserData.recentlyPlayed);
+            setPrivacy(otherUserData.privacy);
+          } catch (error) {
+            console.error('Error:', error);
+          }
+        }
+      } catch (error) { 
         console.error('Error:', error); 
-      });
+      }
+    }
+  
+    fetchData();
   }, []);
 
-  // get privacy setting
-  useEffect(() => {
-    if (userID) {               // Make sure ID is not null
+  // get privacy setting  (of currently logged in user)
+  useEffect(() => {    
+    if (userID) {           // Make sure ID is not null
       fetch(`/api/getUser?userID=${userID}`)
         .then(response => response.json())
         .then(data => {
@@ -58,7 +91,7 @@ function ProfilePage() {
     }
   }, [userID]);
 
-  // get recently played song
+  // get recently played song  (of currently logged in user)
   useEffect(() => {
     if (userID) {
       fetch(`/api/getRecentlyPlayed`)
@@ -84,63 +117,111 @@ function ProfilePage() {
   }, [userID]);
 
   // default = top artists over last month   and load info into database
-  useEffect(() => {
+  useEffect(() => {    
     const helperFunction = async () => {
-      await handleTopArtists('long_term', 10, true, false);
-      await handleTopArtists('medium_term', 10, true, false);
+      if (userID) {
+        await handleTopArtists('long_term', 10, true, false);
+        await handleTopArtists('medium_term', 10, true, false);
+      }
       await handleTopArtists('short_term', 10, true);
     }
     helperFunction();
-  }, []);
+  }, [userID, otherUserIsDisplayed]);
   
   // default = top songs over last month   and load info into database
-  useEffect(() => {
+  useEffect(() => {    
     const helperFunction = async () => {
-      await handleTopSongs('long_term', 10, true, false);
-      await handleTopSongs('medium_term', 10, true, false);
+      if (userID) {
+        // only needed for logged in user
+        await handleTopSongs('long_term', 10, true, false);
+        await handleTopSongs('medium_term', 10, true, false);
+      }
       await handleTopSongs('short_term', 10, true);
     }
-    helperFunction();
-  }, []);
+    helperFunction();      
+  }, [userID, otherUserIsDisplayed]);
 
   // default = top genres over last month  and load info into database
   useEffect(() => {
     handleTopGenres('short_term', 10, true);
-  }, []);
+  }, [userID, otherUserIsDisplayed]);
 
   // get top artists
   async function handleTopArtists(timeFrame, count, init = false, loadOnPage = true) {
-    fetch(`/api/topArtists?timeFrame=${timeFrame}&count=${count}&init=${init}`)
-      .then(response => response.json())
-      .then(data => {
-        if (loadOnPage) {
-          console.log(data);
-          setArtists(data.items.map(item => item.name));
-          setArtistPics(data.items.map(item => item.images[0].url));
-          setArtistURLs(data.items.map(item => item.external_urls.spotify));
-        }
-      })
-      .catch((error) => { 
-        console.error('Error:', error); 
-      });
+    if (userID) {
+      fetch(`/api/topArtists?timeFrame=${timeFrame}&count=${count}&init=${init}`)
+        .then(response => response.json())
+        .then(data => {
+          if (loadOnPage) {
+            console.log(data);
+            setArtists(data.items.map(item => item.name));
+            setArtistPics(data.items.map(item => item.images[0].url));
+            setArtistURLs(data.items.map(item => item.external_urls.spotify));
+          }
+        })
+        .catch((error) => { 
+          console.error('Error:', error); 
+        });
+    }
+    else {
+
+      // timeframe for database content
+      var topArtistsTime = '';
+      if      (timeFrame === 'short_term')  { topArtistsTime = 'topArtists1M'; }
+      else if (timeFrame === 'medium_term') { topArtistsTime = 'topArtists6M'; }
+      else                                  { topArtistsTime = 'topArtists1Y'; }
+
+      fetch(`/api/getUser?userID=${displayedUserID}`)
+        .then(response => response.json())
+        .then(data => {
+          setArtists(data[topArtistsTime].map(artist => artist.artistName));
+          setArtistPics(data[topArtistsTime].map(artist => artist.image));
+          setArtistURLs(data[topArtistsTime].map(artist => artist.url));
+        })
+        .catch((error) => { 
+          console.error('Error:', error); 
+        });
+    }
   }
 
   // get top songs
   async function handleTopSongs(timeFrame, count, init = false, loadOnPage = true) {
-    fetch(`/api/topSongs?timeFrame=${timeFrame}&count=${count}&init=${init}`)
-      .then(response => response.json())
-      .then(data => {
-        if (loadOnPage) {
-          console.log(data);
-          setSongs(data.items.map(item => item.name));
-          setSongPics(data.items.map(item => item.album.images[0].url));
-          setSongSingers(data.items.map(item => item.artists[0].name));
-          setSongURLs(data.items.map(item => item.external_urls.spotify));
-        }
-      })
-      .catch((error) => { 
-        console.error('Error:', error); 
-      });
+    if (userID) {
+      fetch(`/api/topSongs?timeFrame=${timeFrame}&count=${count}&init=${init}`)
+        .then(response => response.json())
+        .then(data => {
+          if (loadOnPage) {
+            console.log(data);
+            setSongs(data.items.map(item => item.name));
+            setSongPics(data.items.map(item => item.album.images[0].url));
+            setSongSingers(data.items.map(item => item.artists[0].name));
+            setSongURLs(data.items.map(item => item.external_urls.spotify));
+          }
+        })
+        .catch((error) => { 
+          console.error('Error:', error); 
+        });
+    }
+    else {
+
+      // timeframe for database content
+      var topSongsTime = '';
+      if      (timeFrame === 'short_term')  { topSongsTime = 'topSongs1M'; }
+      else if (timeFrame === 'medium_term') { topSongsTime = 'topSongs6M'; }
+      else                                  { topSongsTime = 'topSongs1Y'; }
+
+      fetch(`/api/getUser?userID=${displayedUserID}`)
+        .then(response => response.json())
+        .then(data => {
+          setSongs(data[topSongsTime].map(song => song.songName));
+          setSongPics(data[topSongsTime].map(song => song.image));
+          setSongSingers(data[topSongsTime].map(song => song.artistName));
+          setSongURLs(data[topSongsTime].map(song => song.url));
+        })
+        .catch((error) => { 
+          console.error('Error:', error); 
+        });
+    }
   }
 
   // get top genres
@@ -207,11 +288,13 @@ function ProfilePage() {
           </div>
         </div>
         <div className="image-container align-right">
-          <img 
-            src={privacy === 'Public' ? publicIcon : privateIcon} 
-            alt="Button image" 
-            onClick={handleChangePrivacy}
-          />
+          {(privacy === 'Public' || privacy === 'Private') && !otherUserIsDisplayed && (
+            <img 
+              src={privacy === 'Public' ? publicIcon : privateIcon} 
+              alt="Button image" 
+              onClick={handleChangePrivacy}
+            />
+          )}
         </div>
       </div>
       </Row>
@@ -268,12 +351,14 @@ function ProfilePage() {
                 ))}
               </ol>
               <div className="d-flex justify-content-end">
-                <Button 
-                  variant="secondary" 
-                  size="sm"
-                  onClick={() => handleSeeMore('artists', artistTimeFrame, artistCount)}>
-                  ...
-                </Button>
+                {!otherUserIsDisplayed && (
+                  <Button 
+                    variant="secondary" 
+                    size="sm"
+                    onClick={() => handleSeeMore('artists', artistTimeFrame, artistCount)}>
+                    ...
+                  </Button>
+                )}
               </div>
             </Card.Body>
           </Card>
@@ -331,12 +416,14 @@ function ProfilePage() {
                 ))}
               </ol>
               <div className="d-flex justify-content-end">
-                <Button 
-                  variant="secondary" 
-                  size="sm"
-                  onClick={() => handleSeeMore('songs', songTimeFrame, songCount)}>
-                  ...
-                </Button>
+                {!otherUserIsDisplayed && (
+                  <Button 
+                    variant="secondary" 
+                    size="sm"
+                    onClick={() => handleSeeMore('songs', songTimeFrame, songCount)}>
+                    ...
+                  </Button>
+                )}
               </div>
             </Card.Body>
           </Card>

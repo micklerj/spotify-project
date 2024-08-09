@@ -1,5 +1,6 @@
 import Footer from '../components/footerButtons';
 import React, {useState, useEffect} from 'react';
+import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Container, Button, Row, Card, Navbar, Nav} from 'react-bootstrap';
 import axios from 'axios';
@@ -23,6 +24,7 @@ function Explore() {
     //   profilePic: '',
     //   userName: '',
     //   recentlyListenedTo: '',
+    //   privacy: '',
     //   isFollowing: true,
     // }
   ]);
@@ -65,7 +67,7 @@ function Explore() {
   useEffect(() => {
     if (followedUserIDList.length > 0 && !initialListLoaded) {
       getDisplayUsers(0);
-      setInitialListLoaded(true);
+      setInitialListLoaded(true);       // Prevents this useEffect from running again
     }
   }, [followedUserIDList]);
 
@@ -97,13 +99,16 @@ function Explore() {
       if (!displayList.some(user => user.userID === userID)) {   // Make sure user is not already in displayList
         return fetch(`/api/getUser?userID=${userID}`)
           .then(response => response.json())
-          .then(data => ({
-            userID: userID,
-            profilePic: data.profilePic,
-            userName: data.username,
-            recentlyListenedTo: data.recentlyPlayed,
-            isFollowing: followedUserIDList.includes(userID),  // Check if userID is followed or not
-          }))
+          .then(data => {
+            return {
+              userID: userID,
+              profilePic: data.profilePic,
+              userName: data.username,
+              recentlyListenedTo: data.recentlyPlayed,
+              privacy: data.privacy,
+              isFollowing: followedUserIDList.includes(userID),  // Check if userID is followed or not
+            };
+          })
           .catch((error) => { 
             console.error('Error:', error); 
           });
@@ -140,7 +145,7 @@ function Explore() {
             }
             idStrings[idStrings.length - 1] += id;
             count++;
-          }
+          }      
         });
         // check if current user follows them
         for (let idString of idStrings) {
@@ -322,12 +327,16 @@ function Explore() {
                       <div className="following-item-content">
                         <img src={user.profilePic} alt="profile pic" className="following-item-image" />
                         <div className="following-item-info">
-                          <p>{user.userName}</p>
+                          <p>
+                            <Link to={`/profile/${user.userID}`}>
+                              {user.userName}
+                            </Link>
+                          </p>
                           <DisplayRecentlyPlayed songTitle={user.recentlyListenedTo} />
                         </div>
                       </div>
                       <div className="follow-image-container">
-                        {user.userID !== userID && (
+                        {user.userID !== userID && user.privacy !== 'Private' && (
                           <img 
                             src={user.isFollowing ? followingCheck : addFollowerIcon} 
                             alt="Button image" 

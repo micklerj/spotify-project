@@ -8,7 +8,7 @@ import './styles/footerButtons.css';
 function Footer() {
 
   const location = useLocation();
-  const isHome = location.pathname === '/home';
+  const isProfile = location.pathname === '/profile';
   const isFollowing = location.pathname === '/following';
   const isExplore = location.pathname === '/explore';
 
@@ -16,7 +16,7 @@ function Footer() {
     <div className="header">
       <div className="navbar">
         <div className="nav-item">
-          <a href="/home" className="nav-link" onClick={(event) => {if(isHome) event.preventDefault();}}>
+          <a href="/profile" className="nav-link" onClick={(event) => {if(isProfile) event.preventDefault();}}>
             <button className="button round-button">1</button>
           </a>
         </div>

@@ -1,5 +1,6 @@
 import Footer from '../components/footerButtons';
 import React, {useState, useEffect, useRef} from 'react';
+import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Container, Button, Row, Card, Navbar, Nav} from 'react-bootstrap';
 import axios from 'axios';
@@ -212,7 +213,11 @@ function Following() {
                   <div className="following-item-content">
                     <img src={user.profilePic} alt="profile pic" className="following-item-image" />
                     <div className="following-item-info">
-                      <p>{user.userName}</p>
+                      <p>
+                        <Link to={`/profile/${user.userID}`}>
+                          {user.userName}
+                        </Link>
+                      </p>
                       <DisplayRecentlyPlayed songTitle={user.recentlyListenedTo} />
                     </div>
                   </div>

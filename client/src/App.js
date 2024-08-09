@@ -1,12 +1,12 @@
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
-import Home from './pages/Home';
+import Profile from './pages/Profile';
 import Login from './pages/Login';
 import NoPage from './pages/NoPage';
 import Following from './pages/Following';
 import Explore from './pages/Explore';
 import ProtectedRoute from './components/protectedRoute';
 
-// TODO: switch / to home and /login to login
+// TODO: switch / to profile and /login to login
 
 import logo from './logo.svg';
 
@@ -18,9 +18,9 @@ function App() {
       <Router>
         <Routes>
           <Route path="/"index element={<Login />} />
-          <Route path="/home" element={
+          <Route path="/profile/:userID?" element={
             <ProtectedRoute>
-              <Home />
+              <Profile />
             </ProtectedRoute>
           } />
           <Route path="/following" element={ 

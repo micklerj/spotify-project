@@ -41,7 +41,7 @@ newUser = async function(req, res) {
   }
 }
 
-// update the user's list of top artists, top songs, or recently played song 
+// update the user's list of top artists, top songs, profile info, or recently played song 
 updateUser = async function(req, res) {
   try {
     // Prepare the update object
@@ -194,11 +194,7 @@ searchUsers = async function(req, res) {
     $project: {
       _id: 0,
       score: {$meta: 'searchScore'},
-      // username: 1, 
       userID: 1, 
-      // profilePic: 1, 
-      // privacy: 1, 
-      // recentlyPlayed: 1, 
     },
   })
 

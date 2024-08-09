@@ -114,7 +114,7 @@ callback = function(req, res) {
           // --------------------------------------------------------------------------
         });
 
-        res.redirect('http://localhost:3000/home');
+        res.redirect('http://localhost:3000/profile');
       } else {
         res.redirect('http://localhost:3000?' +
           querystring.stringify({
