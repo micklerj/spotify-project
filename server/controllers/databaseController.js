@@ -202,4 +202,15 @@ searchUsers = async function(req, res) {
   res.json(result)
 }
 
-module.exports = { getUser, newUser, updateUser, changePrivacy, addToFollowing, removeFromFollowing, getAllUserIDs, searchUsers };
+// logout (delete session from DB)
+logout = async function(req, res) {
+  try {
+    req.session.destroy();
+    res.status(200).json({ message: 'Logged out' });
+  }
+  catch (err){
+    console.log(err);
+  }
+}
+
+module.exports = { getUser, newUser, updateUser, changePrivacy, addToFollowing, removeFromFollowing, getAllUserIDs, searchUsers, logout };

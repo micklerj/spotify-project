@@ -20,6 +20,7 @@
 .image-container img {
   width: 25px;
   border-radius: 50%; /* makes the image a circle */
+  cursor: pointer;
   transition: opacity 0.2s ease-in-out; /* transition effect */
 }
 
@@ -27,6 +28,33 @@
   opacity: 0.5; /* makes the image darker on hover */
 }
 
+.logout-button-container {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.logout-button-container button {
+  border: none;
+  outline: none;
+  background-color: #e6e6e6;
+  border-radius: 50px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 12px;
+}
+
+.logout-button-container button:hover {
+  background-color: #dadcde;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 30vh;
+}
 
 /* top artists list */
 .artist-list {
@@ -98,4 +126,27 @@
 .song-item-image {
   width: 50px;
   margin-right: 10px;
+}
+
+/* private user message */
+.private-user-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.private-user-container img {
+  width: 100px;
+  height: 100px; 
+  border: 1px solid #000; 
+  border-radius: 50%;
+  object-fit: cover; 
+  padding: 10px; 
+  box-sizing: border-box; 
+}
+
+.private-user-container p {
+  font-size: 24px;
+  font-weight: bold;
 }
