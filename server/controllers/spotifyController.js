@@ -87,10 +87,10 @@ callback = function(req, res) {
         };
       
         request.get(options, async function(error, response, body) {
-          if (body.images && body.images.length > 1) {
+          // if (body.images && body.images.length > 1) {
             const postData = {
               "username": body.display_name,
-              "profilePic": body.images[1].url,
+              "profilePic": body.images[1] ? body.images[1].url : 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y',
               "userID": body.id,
               "privacy": "Public",
               "recentlyPlayed": "",
@@ -110,7 +110,7 @@ callback = function(req, res) {
               .catch((error) => { 
                 console.error('Error:', error);
               })
-          }
+          // }
           // --------------------------------------------------------------------------
         });
 
@@ -233,11 +233,110 @@ topSongs = function(req, res) {
   });
 };
 
-topGenres = function(req, res) {
+// get request for top genres
+topGenres = async function(req, res) {
   var timeFrame = req.query.timeFrame || 'short_term';
-  var count = req.query.count || 10;
   var init = req.query.init === 'true'; 
-  //TODO = logic for getting genres
+
+  var genreRanks = new Map();
+
+  // get top 50 songs -> song's artist -> artist's genres
+  var options = {
+    url: 'https://api.spotify.com/v1/me/top/tracks?' +
+      querystring.stringify({
+        time_range: timeFrame,
+        limit: 50,
+        offset: 0
+      }),
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + req.session.accessToken 
+    },
+    json: true 
+  };
+  try {
+    const response = await axios.get(options.url, { headers: options.headers });
+    await Promise.all(response.data.items.map(async (item, index) => {
+      const artistID = item.artists[0].id;
+      var artistOptions = {
+        url: `https://api.spotify.com/v1/artists/${artistID}`,
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + req.session.accessToken 
+        }
+      };
+  
+      try {
+        const artistResponse = await axios.get(artistOptions.url, { headers: artistOptions.headers });
+        artistResponse.data.genres.forEach(genre => {
+          // Add points to the genre in the map
+          var points = genreRanks.get(genre) || 0;
+          points += 50 - index;
+          genreRanks.set(genre, points);
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }));
+  } catch (error) {
+    console.error(error);
+  }
+
+  // get top 50 artists -> artist's genres
+  var options2 = {
+    url: 'https://api.spotify.com/v1/me/top/artists?' +
+      querystring.stringify({
+        time_range: timeFrame,   
+        limit: 50,
+        offset: 0
+      }),
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + req.session.accessToken 
+    }
+  };
+  
+  try {
+    const response = await axios.get(options2.url, { headers: options2.headers });
+    response.data.items.forEach((item, index) => {
+      item.genres.forEach(genre => {
+        // Add points to the genre in the map
+        var points = genreRanks.get(genre) || 0;
+        points += 50 - index;
+        genreRanks.set(genre, points);
+      });
+    });
+  } catch (error) {
+    console.error(error);
+  }
+
+  // Convert the Map to an array and sort it
+  var sortedGenreRanks = Array.from(genreRanks.entries()).sort((a, b) => b[1] - a[1]);
+
+  // update database if init is true (first rendering of the user's profile)
+  if (init) {
+    // get user ID
+    const profileBody = await getProfileInfo(req.session.accessToken);
+    var userID = profileBody.id;
+
+    // set timeframe for updated database content
+    var topGenresTime = '';
+    if      (timeFrame === 'short_term')  { topGenresTime = 'topGenres1M'; }
+    else if (timeFrame === 'medium_term') { topGenresTime = 'topGenres6M'; }
+    else                                  { topGenresTime = 'topGenres1Y'; }
+
+    const putData = {
+      "userID": userID,
+      [topGenresTime]: sortedGenreRanks.slice(0, 10).map(pair => pair[0])
+    }
+
+    await axios.put('http://localhost:3500/api/updateUser', putData)
+      .catch((error) => { 
+        console.error('Error:', error);
+      })
+  }
+
+  res.json(sortedGenreRanks.slice(0, 50));
 }
 
 // TODO: delete this function and route
@@ -328,6 +427,7 @@ async function refreshAccessToken(req) {
 
 // check if current user is following other user(s)
 followCheck = function(req, res) {
+  // TODO: this sometimes and works and sometimes does not. no clue why
   const ids = req.query.ids;
   var options = {
     url: 'https://api.spotify.com/v1/me/following/contains?' +
@@ -341,8 +441,28 @@ followCheck = function(req, res) {
     },
     json: true 
   };
+  console.log(options);
 
   request.get(options, async function(error, response, body) {   
+    if (error) {
+      console.error('Error:', error);
+      res.status(500).json({ error: 'Failed to fetch from Spotify API' });
+      return;
+    }
+  
+    if (response.statusCode !== 200) {
+      console.error('Error:', response.statusCode, body);
+      res.status(response.statusCode).json({ error: 'Failed to fetch from Spotify API' });
+      return;
+    }
+  
+    if (body === undefined) {
+      console.error('Error: body is undefined');
+      res.status(500).json({ error: 'No data returned from Spotify API' });
+      return;
+    }
+  
+    console.log(body);
     res.json(body);
   });
 }
@@ -390,7 +510,7 @@ unfollow = function(req, res) {
 }
 
 // get recently played songs
-// note: this spotify endpoint sucks and isn't the most recent song played
+// note: this spotify endpoint isn't always the most accurate
 getRecentlyPlayed = function(req, res) {
   var options = {
     url: 'https://api.spotify.com/v1/me/player/recently-played?' +
@@ -409,4 +529,4 @@ getRecentlyPlayed = function(req, res) {
   });
 }
 
-module.exports = { login, callback, topArtists, topSongs, profileInfo, test, ensureAuth, followCheck, follow, unfollow, getRecentlyPlayed };
+module.exports = { login, callback, topArtists, topSongs, topGenres, profileInfo, test, ensureAuth, followCheck, follow, unfollow, getRecentlyPlayed };

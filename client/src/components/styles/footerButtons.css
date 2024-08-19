@@ -15,25 +15,23 @@
   text-decoration: none;
 }
 
-.button {
-  background-color: rgb(91, 91, 91);
+.footer-button {
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  font-size: 10px;
+  white-space: nowrap;
+  background-color: rgb(120, 118, 118);
   border: none;
   color: white;
   text-align: center;
   display: inline-block;
   font-size: 16px;
   transition-duration: 0.4s;
+  transition: background-color .25s ease-in-out;
   cursor: pointer;
 }
 
-.button:hover  {
-  opacity: 0.8; /* makes the image darker on hover */
-}
-
-.round-button {
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  font-size: 10px;
-  white-space: nowrap;
+.footer-button:hover {
+  background-color: #63686a;
 }

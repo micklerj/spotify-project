@@ -41,7 +41,7 @@ newUser = async function(req, res) {
   }
 }
 
-// update the user's list of top artists, top songs, profile info, or recently played song 
+// update the user's list of top artists, top songs, top genres, profile info, or recently played song 
 updateUser = async function(req, res) {
   try {
     // Prepare the update object
@@ -202,6 +202,17 @@ searchUsers = async function(req, res) {
   res.json(result)
 }
 
+// get # of users
+getUserCount = async function(req, res) {
+  try {
+    const count = await user.countDocuments();
+    res.json({ count });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Failed to get user count' });
+  }
+};
+
 // logout (delete session from DB)
 logout = async function(req, res) {
   try {
@@ -213,4 +224,4 @@ logout = async function(req, res) {
   }
 }
 
-module.exports = { getUser, newUser, updateUser, changePrivacy, addToFollowing, removeFromFollowing, getAllUserIDs, searchUsers, logout };
+module.exports = { getUser, newUser, updateUser, changePrivacy, addToFollowing, removeFromFollowing, getAllUserIDs, searchUsers, getUserCount, logout };

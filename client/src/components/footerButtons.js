@@ -1,5 +1,3 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
-import {Button, Navbar, Nav} from 'react-bootstrap';
 import { useLocation } from 'react-router-dom';
 import './styles/footerButtons.css';
 
@@ -17,17 +15,17 @@ function Footer() {
       <div className="navbar">
         <div className="nav-item">
           <a href="/profile" className="nav-link" onClick={(event) => {if(isProfile) event.preventDefault();}}>
-            <button className="button round-button">1</button>
+            <button className="footer-button">1</button>
           </a>
         </div>
         <div className="nav-item">
           <a href="/following" className="nav-link" onClick={(event) => {if(isFollowing) event.preventDefault();}}>
-            <button className="button round-button">2</button>
+            <button className="footer-button">2</button>
           </a>
         </div>
         <div className="nav-item">
           <a href="/explore" className="nav-link" onClick={(event) => {if(isExplore) event.preventDefault();}}>
-            <button className="button round-button">3</button>
+            <button className="footer-button">3</button>
           </a>
         </div>
       </div>

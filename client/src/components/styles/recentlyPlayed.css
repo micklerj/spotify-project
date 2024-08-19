@@ -12,7 +12,7 @@
   box-sizing: content-box;
 }
 
-.title {
+.song-title {
   white-space: nowrap;
   font-size: 14px;
 }

@@ -23,5 +23,7 @@ router.get('/searchUsers', databaseController.searchUsers);
 
 router.post('/logout', databaseController.logout);
 
+router.get('/getUserCount', databaseController.getUserCount);
+
 
 module.exports = router;

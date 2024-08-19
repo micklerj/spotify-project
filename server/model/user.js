@@ -120,23 +120,14 @@ const userSchema = new Schema({
       required: true
     }
   }],
-  TopGenres1M: [{
-    genre: {
-      type: String,
-      required: true
-    }
+  topGenres1M: [{
+    type: String
   }],
-  TopGenres6M: [{
-    genre: {
-      type: String,
-      required: true
-    }
+  topGenres6M: [{
+    type: String
   }],
-  TopGenres1Y: [{
-    genre: {
-      type: String,
-      required: true
-    }
+  topGenres1Y: [{
+    type: String
   }]
 });
 

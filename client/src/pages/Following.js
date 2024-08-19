@@ -1,8 +1,6 @@
 import Footer from '../components/footerButtons';
 import React, {useState, useEffect, useRef} from 'react';
 import { Link } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import {Container, Button, Row, Card, Navbar, Nav} from 'react-bootstrap';
 import axios from 'axios';
 import followingCheck from '../assets/followingCheck.png';
 import addFollowerIcon from '../assets/addFollowerIcon.png';
@@ -197,48 +195,44 @@ function Following() {
     }
   }
 
+  //TODO: implement search and infinite scroll
   return (
     <div className="following page">
       <h1>  Following Page </h1>
 
-      <div>
-        <Card style={{ width: "400px" }}>
-          <Card.Body>
-            <Card.Title style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              Following
-            </Card.Title>
-            <ol className="following-list">
-              {followingList.map((user, index) => (
-                <li key={index} className="following-item">
-                  <div className="following-item-content">
-                    <img src={user.profilePic} alt="profile pic" className="following-item-image" />
-                    <div className="following-item-info">
-                      <p>
-                        <Link to={`/profile/${user.userID}`}>
-                          {user.userName}
-                        </Link>
-                      </p>
-                      <DisplayRecentlyPlayed songTitle={user.recentlyListenedTo} />
-                    </div>
-                  </div>
-                  <div className="follow-image-container">
-                    <img 
-                      src={user.isFollowing ? followingCheck : addFollowerIcon} 
-                      alt="Button image" 
-                      onClick={() => handleToggleFollow(user.userID, user.isFollowing)}
-                    />
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </Card.Body>
-        </Card>
+      <div className='followed-users-container'>
+        <div className='list-title'>
+          Following
+        </div>
+        <ol className="following-list">
+          {followingList.map((user, index) => (
+            <li key={index} className="following-item">
+              <div className="following-item-content">
+                <img src={user.profilePic} alt="profile pic" className="following-item-image" />
+                <div className="following-item-info">
+                  <p>
+                    <Link to={`/profile/${user.userID}`}>
+                      {user.userName}
+                    </Link>
+                  </p>
+                  <DisplayRecentlyPlayed songTitle={user.recentlyListenedTo} />
+                </div>
+              </div>
+              <div className="following-follow-image-container">
+                <img 
+                  src={user.isFollowing ? followingCheck : addFollowerIcon} 
+                  alt="Button image" 
+                  onClick={() => handleToggleFollow(user.userID, user.isFollowing)}
+                />
+              </div>
+            </li>
+          ))}
+        </ol>
       </div>
 
 
       <Footer />
-    </div>    
-
+    </div>  
 
   );
 }

@@ -1,27 +1,34 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
-import {Container, InputGroup, FormControl, Button, Row, Card} from 'react-bootstrap';
-import React, {useState, useEffect} from 'react';
+import React from 'react';
+import './styles/Login.css';
 
 function Login() {
-  const [authResponse, setAuthResponse] = useState([{}]);
 
   async function handleLogin() {
     window.location.href = 'http://localhost:3500/api/login';
   }
 
   return (
-    <div className="login page">
-      <div>
-        <p>Login Page</p>
+    <div className="login-page">
+
+      <div className='login-body-container'>
+
+        <div className='title'>
+          Wraptify
+        </div>
+
+        <div className="login-container">
+          <p className='h1'>Welcome to Wraptify</p>
+          <p className='h2'>Discover your most played artists, songs, and genres</p>
+          <p className='h3'>See what your friends have been listening to, and find new friends with similar music tastes</p>
+          <button 
+            className="login-button"
+            onClick={handleLogin}>
+            Login with Spotify
+          </button>
+          <p className='h4'>Dont have a spotify account?</p>
+          <p className='h4'>join <a href='https://www.spotify.com/us/signup'>here</a></p>
+        </div>
       </div>
-
-      <Button 
-        variant="primary"
-        onClick={handleLogin}>
-        Login with Spotify
-      </Button>
-
-
 
     </div>
   );

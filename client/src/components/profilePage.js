@@ -1,5 +1,3 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
-import {Container, Button, Row, Card, Navbar, Nav} from 'react-bootstrap';
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import privateIcon from '../assets/private.png';
@@ -23,7 +21,8 @@ function ProfilePage({displayedUserID}) {
   const [songTimeFrame, setSongTimeFrame] = useState('short_term');
   const [songCount, setSongCount] = useState(10);
   const [genres, setGenres] = useState([]);
-  const [GenreTimeFrame, setGenreTimeFrame] = useState('short_term');
+  const [displayGenres, setDisplayGenres] = useState([]);
+  const [genreTimeFrame, setGenreTimeFrame] = useState('short_term');
   const [genreCount, setGenreCount] = useState(10);
   const [profilePic, setProfilePic] = useState('');
   const [userName, setUserName] = useState('');
@@ -47,6 +46,7 @@ function ProfilePage({displayedUserID}) {
           setOtherUserIsDisplayed(false);
           setWasOriginallyFollowed(false);  // doesn't matter, but need this line in order for loading to finish
           setUserID(data.id); 
+          console.log('current user ID: ', data.id);
           setProfilePic(data.images[1].url);
           setUserName(data.display_name);
           console.log(data);
@@ -147,10 +147,12 @@ function ProfilePage({displayedUserID}) {
         await handleTopArtists('long_term', 10, true, false);
         await handleTopArtists('medium_term', 10, true, false);
       }
-      await handleTopArtists('short_term', 10, true);
+      if (userID || userIDDupe) {
+        await handleTopArtists('short_term', 10, true);
+      }
     }
     helperFunction();
-  }, [userID, otherUserIsDisplayed]);
+  }, [userID, userIDDupe]);
   
   // default = top songs over last month   and load info into database
   useEffect(() => {    
@@ -160,16 +162,28 @@ function ProfilePage({displayedUserID}) {
         await handleTopSongs('long_term', 10, true, false);
         await handleTopSongs('medium_term', 10, true, false);
       }
-      await handleTopSongs('short_term', 10, true);
+      if (userID || userIDDupe) {
+        await handleTopSongs('short_term', 10, true);
+      }
     }
     helperFunction(); 
 
-  }, [userID, otherUserIsDisplayed]);
+  }, [userID, userIDDupe]);
 
   // default = top genres over last month  and load info into database
   useEffect(() => {
-    handleTopGenres('short_term', 10, true);
-  }, [userID, otherUserIsDisplayed]);
+    const helperFunction = async () => {
+      if (userID) {
+        // only needed for logged in user
+        await handleTopGenres('long_term', true, false);
+        await handleTopGenres('medium_term', true, false);
+      }
+      if (userID || userIDDupe) {
+        await handleTopGenres('short_term', true);
+      }
+    }
+    helperFunction(); 
+  }, [userID, userIDDupe]);
 
   // done loading
   useEffect(() => {
@@ -218,6 +232,7 @@ function ProfilePage({displayedUserID}) {
 
   // get top songs
   async function handleTopSongs(timeFrame, count, init = false, loadOnPage = true) {
+    console.log('test ID: ', userID);
     if (userID) {
       fetch(`/api/topSongs?timeFrame=${timeFrame}&count=${count}&init=${init}`)
         .then(response => response.json())
@@ -257,16 +272,39 @@ function ProfilePage({displayedUserID}) {
   }
 
   // get top genres
-  async function handleTopGenres(timeFrame, count, init = false, loadOnPage = true) {
-    fetch(`/api/topGenres?timeFrame=${timeFrame}&count=${count}&init=${init}`)
-      .then(response => response.json())
-      .then(data => {
-        console.log(data);
-        setGenres(data.items.map(item => item.name));
-      })
-      .catch((error) => { 
-        console.error('Error:', error); 
-      });
+  async function handleTopGenres(timeFrame, init = false, loadOnPage = true) { 
+    if (userID) {
+      // get all 50 top genres from api
+      fetch(`/api/topGenres?timeFrame=${timeFrame}&init=${init}`)
+        .then(response => response.json())
+        .then(data => {
+          if (loadOnPage) {
+            var newGenres = data.map(pair => pair[0]);
+            setGenres(newGenres);
+            setDisplayGenres(newGenres.slice(0, 10));
+          }
+        })
+        .catch((error) => { 
+          console.error('Error:', error); 
+        });
+    }
+    else {
+      // timeframe for database content
+      var topGenresTime = '';
+      if      (timeFrame === 'short_term')  { topGenresTime = 'topGenres1M'; }
+      else if (timeFrame === 'medium_term') { topGenresTime = 'topGenres6M'; }
+      else                                  { topGenresTime = 'topGenres1Y'; }
+
+      fetch(`/api/getUser?userID=${displayedUserID}`)
+        .then(response => response.json())
+        .then(data => {
+          setGenres(data[topGenresTime]);
+          setDisplayGenres(data[topGenresTime]);
+        })
+        .catch((error) => { 
+          console.error('Error:', error); 
+        });
+    }
   }
 
   // load more items to show
@@ -284,8 +322,8 @@ function ProfilePage({displayedUserID}) {
       setSongCount(count);
     }
     else if (type === 'genres') {
-      handleTopGenres(timeFrame, count);
       setGenreCount(count);
+      setDisplayGenres(genres.slice(0, count));
     }
   }
 
@@ -375,7 +413,7 @@ function ProfilePage({displayedUserID}) {
           <button onClick={handleLogout}>Logout</button>
         )}
       </div>
-      <Row bg="light" expand="lg" className="d-flex align-items-center">
+
       <div className="profile-container">
         <img src={profilePic} alt="Profile Picture" className="rounded-circle mr-2 profile-image" />
         <div className="profile-info">
@@ -393,7 +431,7 @@ function ProfilePage({displayedUserID}) {
               title="Change privacy"
             />
           )}
-          { otherUserIsDisplayed && (privacy === 'Public' || (privacy === 'Private' && otherUserIsFollowed) || wasOriginallyFollowed) && (
+          { otherUserIsDisplayed && (privacy === 'Public' || wasOriginallyFollowed) && (
             <img 
               src={otherUserIsFollowed ? followingCheck : addFollowerIcon} 
               alt="(un)follow image" 
@@ -403,156 +441,185 @@ function ProfilePage({displayedUserID}) {
           )}
         </div>
       </div>
-      </Row>
+      
       
       {loading ? (
         <div className="loading-container">Loading...</div>
         ) : (
         (!otherUserIsDisplayed || privacy === 'Public' || wasOriginallyFollowed) ? (
 
-          <Container>
+          <div className="body-container"> 
 
-            <Row className="justify-content-center mt-4">
-              <Card style={{ width: "400px" }}>
-                <Card.Body>
-                  <Card.Title style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    Top Artists
-                    <div style={{ display: 'flex' }}>
-                      <Button 
-                        variant="secondary" 
-                        style={{ borderRadius: '50%', width: '30px', height: '30px', marginLeft: '10px', fontSize: '10px', whiteSpace: 'nowrap' }}
-                        onClick={() => {
-                          handleTopArtists('short_term', 10);
-                          setArtistTimeFrame('short_term');
-                          setArtistCount(10);
-                        }}>
-                        1M
-                      </Button>
-                      <Button 
-                        variant="secondary" 
-                        style={{ borderRadius: '50%', width: '30px', height: '30px', marginLeft: '10px', fontSize: '10px', whiteSpace: 'nowrap' }}
-                        onClick={() => {
-                          handleTopArtists('medium_term', 10);
-                          setArtistTimeFrame('medium_term');
-                          setArtistCount(10);
-                        }}>
-                        6M
-                      </Button>
-                      <Button 
-                        variant="secondary" 
-                        style={{ borderRadius: '50%', width: '30px', height: '30px', marginLeft: '10px', fontSize: '10px', whiteSpace: 'nowrap' }}
-                        onClick={() => {
-                          handleTopArtists('long_term', 10);
-                          setArtistTimeFrame('long_term');
-                          setArtistCount(10);
-                        }}>
-                        1Y
-                      </Button>
+            <div className="top-items-container">
+              <div className="items-header">
+                Top Artists
+                <div class="buttons-container">
+                  <button 
+                    className={`button time-frame-button ${artistTimeFrame === 'short_term' ? 'active-button' : ''}`}
+                    onClick={() => {
+                      handleTopArtists('short_term', 10);
+                      setArtistTimeFrame('short_term');
+                      setArtistCount(10);
+                    }}>
+                    1M
+                  </button>
+                  <button 
+                    className={`button time-frame-button ${artistTimeFrame === 'medium_term' ? 'active-button' : ''}`}
+                    onClick={() => {
+                      handleTopArtists('medium_term', 10);
+                      setArtistTimeFrame('medium_term');
+                      setArtistCount(10);
+                    }}>
+                    6M
+                  </button>
+                  <button 
+                    className={`button time-frame-button ${artistTimeFrame === 'long_term' ? 'active-button' : ''}`}
+                    onClick={() => {
+                      handleTopArtists('long_term', 10);
+                      setArtistTimeFrame('long_term');
+                      setArtistCount(10);
+                    }}>
+                    1Y
+                  </button>
+                </div>
+              </div>
+              <ol className="artist-list">
+                {artists.map((artist, index) => (
+                  <li key={index} className="artist-item">
+                    <div className="artist-item-index">{index + 1}</div>
+                    <div className="artist-item-content">
+                      <img src={artistPics[index]} alt={artist} className="artist-item-image" />
+                      <a href={artistURLs[index]} className="artist-item-link">{artist}</a>
                     </div>
-                  </Card.Title>
-                  <ol className="artist-list">
-                    {artists.map((artist, index) => (
-                      <li key={index} className="artist-item">
-                        <div className="artist-item-index">{index + 1}</div>
-                        <div className="artist-item-content">
-                          <img src={artistPics[index]} alt={artist} className="artist-item-image" />
-                          <a href={artistURLs[index]} className="artist-item-link">{artist}</a>
-                        </div>
-                      </li>
-                    ))}
-                  </ol>
-                  <div className="d-flex justify-content-end">
-                    {!otherUserIsDisplayed && (
-                      <Button 
-                        variant="secondary" 
-                        size="sm"
-                        onClick={() => handleSeeMore('artists', artistTimeFrame, artistCount)}>
-                        ...
-                      </Button>
-                    )}
-                  </div>
-                </Card.Body>
-              </Card>
-            </Row>
-            <Row className="justify-content-center mt-4">
-              <Card style={{ width: "400px" }}>
-                <Card.Body>
-                  <Card.Title style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    Top Songs
-                    <div style={{ display: 'flex' }}>
-                      <Button 
-                        variant="secondary" 
-                        style={{ borderRadius: '50%', width: '30px', height: '30px', marginLeft: '10px', fontSize: '10px', whiteSpace: 'nowrap' }}
-                        onClick={() => {
-                          handleTopSongs('short_term', 10);
-                          setSongTimeFrame('short_term');
-                          setSongCount(10);
-                        }}>
-                        1M
-                      </Button>
-                      <Button 
-                        variant="secondary" 
-                        style={{ borderRadius: '50%', width: '30px', height: '30px', marginLeft: '10px', fontSize: '10px', whiteSpace: 'nowrap' }}
-                        onClick={() => {
-                          handleTopSongs('medium_term', 10);
-                          setSongTimeFrame('medium_term');
-                          setSongCount(10);
-                        }}>
-                        6M
-                      </Button>
-                      <Button 
-                        variant="secondary" 
-                        style={{ borderRadius: '50%', width: '30px', height: '30px', marginLeft: '10px', fontSize: '10px', whiteSpace: 'nowrap' }}
-                        onClick={() => {
-                          handleTopSongs('long_term', 10);
-                          setSongTimeFrame('long_term');
-                          setSongCount(10);
-                        }}>
-                        1Y
-                      </Button>
-                    </div>
-                  </Card.Title>
-                  <ol className="song-list">
-                    {songs.map((song, index) => (
-                      <li key={index} className="song-item">
-                        <div className="song-item-content">
-                          <div className="song-item-index">{index + 1}</div>
-                          <div className="song-item-info">
-                            <a href={songURLs[index]} className="song-item-link">{song}</a>
-                            <div>{songSingers[index]}</div>
-                          </div>
-                        </div>
-                        <img src={songPics[index]} className="song-item-image" />
-                      </li>
-                    ))}
-                  </ol>
-                  <div className="d-flex justify-content-end">
-                    {!otherUserIsDisplayed && (
-                      <Button 
-                        variant="secondary" 
-                        size="sm"
-                        onClick={() => handleSeeMore('songs', songTimeFrame, songCount)}>
-                        ...
-                      </Button>
-                    )}
-                  </div>
-                </Card.Body>
-              </Card>
-            </Row>
-            <Row className="justify-content-center mt-4 mb-4">
-              <Card style={{ width: "400px" }}>
-                <Card.Body>
-                  <Card.Title>Top Genres</Card.Title>
-                  <ol>
-                    {genres.map((genre, index) => (
-                      <li key={index}>{genre}</li>
-                    ))}
-                  </ol>
-                </Card.Body>
-              </Card>
-            </Row>
+                  </li>
+                ))}
+              </ol>
+              <div className="see-more-button">
+                {!otherUserIsDisplayed && (artistCount < 50) && (
+                  <button 
+                    className="button"
+                    onClick={() => handleSeeMore('artists', artistTimeFrame, artistCount)}>
+                    ...
+                  </button>
+                )}
+              </div>
+            </div>
 
-          </Container>  ) : (
+            <div className="top-items-container">
+              <div className="items-header">
+                Top Songs
+                <div class="buttons-container">
+                  <button 
+                    className={`button time-frame-button ${songTimeFrame === 'short_term' ? 'active-button' : ''}`}
+                    onClick={() => {
+                      handleTopSongs('short_term', 10);
+                      setSongTimeFrame('short_term');
+                      setSongCount(10);
+                    }}>
+                    1M
+                  </button>
+                  <button 
+                    className={`button time-frame-button ${songTimeFrame === 'medium_term' ? 'active-button' : ''}`}
+                    onClick={() => {
+                      handleTopSongs('medium_term', 10);
+                      setSongTimeFrame('medium_term');
+                      setSongCount(10);
+                    }}>
+                    6M
+                  </button>
+                  <button 
+                    className={`button time-frame-button ${songTimeFrame === 'long_term' ? 'active-button' : ''}`}
+                    onClick={() => {
+                      handleTopSongs('long_term', 10);
+                      setSongTimeFrame('long_term');
+                      setSongCount(10);
+                    }}>
+                    1Y
+                  </button>
+                </div>
+              </div>
+              <ol className="song-list">
+                {songs.map((song, index) => (
+                  <li key={index} className="song-item">
+                    <div className="song-item-content">
+                      <div className="song-item-index">{index + 1}</div>
+                      <div className="song-item-info">
+                        <a href={songURLs[index]} className="song-item-link">{song}</a>
+                        <div>{songSingers[index]}</div>
+                      </div>
+                    </div>
+                    <img src={songPics[index]} className="song-item-image" />
+                  </li>
+                ))}
+              </ol>
+              <div className="see-more-button">
+                {!otherUserIsDisplayed && (songCount < 50) && (
+                  <button 
+                    className='button'
+                    onClick={() => handleSeeMore('songs', songTimeFrame, songCount)}>
+                    ...
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="top-items-container">
+              <div className="items-header">
+                Top Genres
+                <div class="buttons-container">
+                  <button 
+                    className={`button time-frame-button ${genreTimeFrame === 'short_term' ? 'active-button' : ''}`}
+                    onClick={() => {
+                      handleTopGenres('short_term');
+                      setGenreTimeFrame('short_term');
+                      setGenreCount(10);
+                    }}>
+                    1M
+                  </button>
+                  <button 
+                    className={`button time-frame-button ${genreTimeFrame === 'medium_term' ? 'active-button' : ''}`}
+                    onClick={() => {
+                      handleTopGenres('medium_term');
+                      setGenreTimeFrame('medium_term');
+                      setGenreCount(10);
+                    }}>
+                    6M
+                  </button>
+                  <button 
+                    className={`button time-frame-button ${genreTimeFrame === 'long_term' ? 'active-button' : ''}`}
+                    onClick={() => {
+                      handleTopGenres('long_term');
+                      setGenreTimeFrame('long_term');
+                      setGenreCount(10);
+                    }}>
+                    1Y
+                  </button>
+                </div>
+              </div>
+              <ol className="genre-list">
+                {displayGenres.map((genre, index) => (
+                  <li key={index} className="genre-item">
+                    <div className="genre-item-content">
+                      <div className="genre-item-index">{index + 1}</div>
+                      <div className="genre-item-info">
+                        <div>{genre}</div>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+              <div className="see-more-button">
+                {!otherUserIsDisplayed && (genreCount < 50) && (
+                  <button 
+                    className='button'
+                    onClick={() => handleSeeMore('genres', genreTimeFrame, genreCount)}>
+                    ...
+                  </button>
+                )}
+              </div>
+            </div>
+
+          </div>  ) : (
           <div className="private-user-container">
             <img src={privateIcon} alt="Lock" />
             <p>This account is private</p>

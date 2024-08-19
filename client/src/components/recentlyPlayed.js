@@ -39,7 +39,7 @@ const DisplayRecentlyPlayed = ({ songTitle }) => {
       <img style={{width: '10px'}}  src= {musicNote}/>
       <div className="song-title-container">
         <div className="title-wrapper">
-          <div className="title" ref={titleRef}>
+          <div className="song-title" ref={titleRef}>
             {songTitle}
           </div>
         </div>

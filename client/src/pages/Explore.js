@@ -1,8 +1,6 @@
 import Footer from '../components/footerButtons';
 import React, {useState, useEffect} from 'react';
 import { Link } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import {Container, Button, Row, Card, Navbar, Nav} from 'react-bootstrap';
 import axios from 'axios';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import followingCheck from '../assets/followingCheck.png';
@@ -15,6 +13,7 @@ import DisplayRecentlyPlayed from '../components/recentlyPlayed';
 
 
 function Explore() {
+  const [userCount, setUserCount] = useState(0);                          // number of users in the DB
   const [userID, setUserID] = useState('');                               // current user's ID
   const [followedUserIDList, setFollowedUserIDList] = useState([]);       // list of IDs of users that current user follows
   const [userIDList, setuserIDList] = useState([]);                       // list of IDs of users that current user does not follow   
@@ -37,12 +36,21 @@ function Explore() {
   
 
 
-  // get current userID
+  // get current userID   and   user count
   useEffect(() => {
     fetch('/api/profileInfo')
       .then(response => response.json())
       .then(data => {
         setUserID(data.id);
+      })
+      .catch((error) => { 
+        console.error('Error:', error); 
+      });
+
+    fetch('/api/getUserCount')
+      .then(response => response.json())
+      .then(data => {
+        setUserCount(data.count);
       })
       .catch((error) => { 
         console.error('Error:', error); 
@@ -67,6 +75,7 @@ function Explore() {
   useEffect(() => {
     if (followedUserIDList.length > 0 && !initialListLoaded) {
       getDisplayUsers(0);
+      console.log('initial list loaded');
       setInitialListLoaded(true);       // Prevents this useEffect from running again
     }
   }, [followedUserIDList]);
@@ -95,6 +104,7 @@ function Explore() {
     //   }
     // });
     
+    console.log('fetching the profiles of users');
     const fetchUsers = userIDList.map(userID => {
       if (!displayList.some(user => user.userID === userID)) {   // Make sure user is not already in displayList
         return fetch(`/api/getUser?userID=${userID}`)
@@ -122,11 +132,10 @@ function Explore() {
     
   }, [userIDList]);
 
-  // get at most 15 of userIDs that the user does not follow at a time
-  async function getDisplayUsers(DBStartIndex) {
-    let idStrings = [''];
-    let count = 0;
-    const limit = 15;
+  // get at most 15 of userIDs that the user does not follow at a time starting at index DBStartIndex
+  async function getDisplayUsers(DBStartIndex = 0) {
+    let idString = '';
+    const limit = 15;  // cant be more than 50
     fetch(`/api/getAllUserIDs?start=${DBStartIndex}&limit=${limit}`)
       .then(response => response.json())
       .then(data => {
@@ -135,47 +144,45 @@ function Explore() {
 
         data.userIDs.forEach((id) => {
           if (!followedUserIDList.includes(id) && id !== userID) {
-            // add userIDs to a string in idStrings[]  (spotify endpoint for followCheck only accepts 50 ids at a time)
-            if (count === 50) {
-              idStrings.push('');
-              count = 0;
+            // add userIDs to a string  (spotify endpoint for followCheck only accepts 50 ids at a time)
+            if (idString !== '') {
+              idString += ',';
             }
-            if (idStrings[idStrings.length - 1] !== '') {
-              idStrings[idStrings.length - 1] += ',';
-            }
-            idStrings[idStrings.length - 1] += id;
-            count++;
+            idString += id;
           }      
         });
         // check if current user follows them
-        for (let idString of idStrings) {
-          fetch(`/api/followCheck?ids=${idString}`)
-            .then(response => response.json())
-            .then(data => {
-              // for any id that is false, add to display list (non-followed user)
-              console.log(data);
-              const ids = idString.split(',');
-              data.forEach((follows, index) => {
-                if (!follows) {
-                  setuserIDList(prevList => [...prevList, ids[index]]);
-                }
-                else {
-                  // if they are followed, add them to the current user's list of following in the DB
-                  const putData = {
-                    "userID": userID,      // current user
-                    "follow": ids[index]   // followed user
-                  };
-                  axios.put('/api/addToFollowing', putData)      
-                    .catch((error) => { 
-                      console.error('Error:', error); 
-                    });
-                }
-              });
-            })
-            .catch((error) => { 
-              console.error('Error:', error); 
+        axios.get(`/api/followCheck?ids=${idString}`)
+          .then(response => {
+            const data = response.data;
+            console.log(data);
+            if (!Array.isArray(data)) {
+              console.error('Error: ', data, ' not an array');
+              return;
+            }
+            const ids = idString.split(',');
+            data.forEach((follows, index) => {
+              if (!follows) {
+                // for any id that is false, add to display list (non-followed user)
+                setuserIDList(prevList => [...prevList, ids[index]]);
+              }
+              else {
+                // if they are followed, add them to the current user's list of following in the DB
+                const putData = {
+                  "userID": userID,      // current user
+                  "follow": ids[index]   // followed user
+                };
+                axios.put('/api/addToFollowing', putData)      
+                  .catch((error) => { 
+                    console.error('Error:', error); 
+                  });
+              }
             });
-        };
+          })
+          .catch((error) => { 
+            console.error('Error:', error); 
+          });
+        
       })
       .catch((error) => { 
         console.error('Error:', error); 
@@ -314,41 +321,41 @@ function Explore() {
       <div >
         <InfiniteScroll
           dataLength={displayList.length}
-          next={() => getDisplayUsers(DBindex)}
+          next={() => {
+            if (DBindex < userCount) {
+              getDisplayUsers(DBindex);
+            }
+          }}
           hasMore={true}
           loader={<h4>Loading...</h4>}
         >
-          <div>
-            <Card style={{ width: "400px" }}>
-              <Card.Body>
-                <ol className="following-list">
-                  {displayList.map((user, index) => (
-                    <li key={index} className="following-item">
-                      <div className="following-item-content">
-                        <img src={user.profilePic} alt="profile pic" className="following-item-image" />
-                        <div className="following-item-info">
-                          <p>
-                            <Link to={`/profile/${user.userID}`}>
-                              {user.userName}
-                            </Link>
-                          </p>
-                          <DisplayRecentlyPlayed songTitle={user.recentlyListenedTo} />
-                        </div>
-                      </div>
-                      <div className="follow-image-container">
-                        {user.userID !== userID && user.privacy !== 'Private' && (
-                          <img 
-                            src={user.isFollowing ? followingCheck : addFollowerIcon} 
-                            alt="Button image" 
-                            onClick={() => handleToggleFollow(user.userID, user.isFollowing)}
-                          />
-                        )}
-                      </div>
-                    </li>
-                  ))}
-                </ol>
-              </Card.Body>
-            </Card>
+          <div className='explore-users-container'>
+            <ol className="following-list">
+              {displayList.map((user, index) => (
+                <li key={index} className="following-item">
+                  <div className="following-item-content">
+                    <img src={user.profilePic} alt="profile pic" className="following-item-image" />
+                    <div className="following-item-info">
+                      <p>
+                        <Link to={`/profile/${user.userID}`}>
+                          {user.userName}
+                        </Link>
+                      </p>
+                      <DisplayRecentlyPlayed songTitle={user.recentlyListenedTo} />
+                    </div>
+                  </div>
+                  <div className="explore-follow-image-container">
+                    {user.userID !== userID && user.privacy !== 'Private' && (
+                      <img 
+                        src={user.isFollowing ? followingCheck : addFollowerIcon} 
+                        alt="Button image" 
+                        onClick={() => handleToggleFollow(user.userID, user.isFollowing)}
+                      />
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ol>
           </div>
           {<div style={{ height: '100vh' }} />} {/* Placeholder */}
         </InfiniteScroll>

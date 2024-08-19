@@ -1,11 +1,16 @@
 .profile-container {
   display: flex;
+  flex-wrap: wrap;
+  margin-right: -15px;
+  margin-left: 50px; /* This is from .profile-container and it overrides the same property in .profile-container-style */
+  background-color: light;
   align-items: center;
-  margin-left: 50px;
 }
 
 .profile-image {
   width: 200px;
+  border-radius: 50%;
+  margin-right: .5rem;
 }
 
 .profile-info {
@@ -49,11 +54,87 @@
   background-color: #dadcde;
 }
 
+.body-container {
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+  margin-bottom: 100px;
+}
+
 .loading-container {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 30vh;
+}
+
+/* top items */
+.top-items-container {
+  justify-content: center;
+  margin-top: 1.5rem;
+  margin-left: auto;
+  margin-right: auto;
+  width: 400px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+  background-color: #fff;
+  padding: 1.25rem;  
+}
+
+.items-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: .5rem;
+  font-size: 1.25rem; 
+  font-weight: 500;
+}
+
+.buttons-container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.button {
+  background-color: rgb(122, 123, 125);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  padding: .25rem .5rem;
+  font-size: .875rem;
+  border-radius: .25rem;
+  transition: background-color .25s ease-in-out
+}
+
+.button:hover {
+  background-color: #585c5e;
+}
+
+.active-button {
+  background-color: #585c5e;
+  border: #2eb61f 1px solid;
+}
+
+.time-frame-button {
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  margin-left: 10px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.see-more-button {
+  display: flex;
+  justify-content: flex-end;
 }
 
 /* top artists list */
@@ -69,7 +150,8 @@
 }
 
 .artist-item-index {
-  margin-right: 10px;
+  width: 20px;
+  text-align: right;
 }
 
 .artist-item-content {
@@ -80,6 +162,7 @@
 .artist-item-image {
   width: 50px;
   margin-right: 10px;
+  margin-left: 10px;
   border-radius: 50%;
 }
 
@@ -107,7 +190,8 @@
 }
 
 .song-item-index {
-  margin-right: 2px;
+  width: 20px;
+  text-align: right;
 }
 
 .song-item-info {
@@ -126,6 +210,26 @@
 .song-item-image {
   width: 50px;
   margin-right: 10px;
+}
+
+/* genre list */
+.genre-list {
+  list-style-type: none;
+}
+
+.genre-item-content {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.genre-item-index {
+  width: 20px;
+  text-align: right;
+}
+
+.genre-item-info {
+  margin-left: 10px;
 }
 
 /* private user message */

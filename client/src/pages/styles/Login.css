@@ -1,0 +1,102 @@
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.login-page {
+  height: 100vh;
+  background-size: 200% 200%;
+  background-image: linear-gradient(45deg, #12314c, #141f54, #4a2c73, #7a4880, #b76cb5);  
+  animation: gradient 20s ease infinite;
+}
+
+.login-body-container {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  position: absolute;
+  top: 10px; 
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.title {
+  font-size: clamp(35px, 9vw, 50px);
+  font-weight: bold;
+  text-align: center;
+  margin: 30px 0 30px 0;
+  color: rgb(221, 221, 221);
+}
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 15px;
+  padding: 4vw; 
+  width: clamp(200px, 75vw, 400px);
+  height: clamp(300px, 50vw, 350px);
+  background-color: rgba(26, 26, 26, 0.5);
+}
+
+.login-container p {
+  text-align: center;
+  margin: 0 0 15px 0;
+  color: rgb(221, 221, 221);
+}
+
+.h1 {
+  font-size: clamp(15px, 6vw, 30px); /* Adjust as needed */
+  font-weight: 700;
+}
+.h2 {
+  font-size: clamp(10px, 4vw, 20px); /* Adjust as needed */
+  font-weight: 500;
+}
+.h3 {
+  font-size: clamp(7px, 3vw, 15px); /* Adjust as needed */
+  font-weight: 300;
+}
+.login-container .h4 {
+  font-size: clamp(7px, 3vw, 15px); /* Adjust as needed */
+  font-weight: 370;
+  margin: 0;
+}
+
+.login-container .h4 a {
+  color: rgb(10, 113, 10);
+  transition-duration: 0.4s;
+}
+
+.login-container .h4 a:hover {
+  color: rgb(87, 167, 75);
+}
+
+.login-button {
+  background-color: #1DB954; 
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: clamp(16px, 4.5vw, 30px);
+  margin: 4px 0 20px 0;
+  cursor: pointer;
+  border-radius: 50px;
+  transition-duration: 0.4s;
+}
+
+
+.login-button:hover {
+  background-color: #258a49;
+}

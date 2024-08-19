@@ -1,3 +1,16 @@
+.explore-users-container {
+  justify-content: center;
+  margin-top: 1.5rem;
+  margin-left: auto;
+  margin-right: auto;
+  width: 400px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+  background-color: #fff;
+  padding: 1.25rem;  
+}
+
 .search-bar {
   display: flex;
   align-items: center;
@@ -40,17 +53,17 @@
 }
 
 .search-bar button:hover img {
-  opacity: 0.6; /* makes the image darker on hover */
+  opacity: 0.6; 
 }
 
-.follow-image-container img {
+.explore-follow-image-container img {
   width: 25px;
   border-radius: 50%; /* makes the image a circle */
   transition: opacity 0.2s ease-in-out; /* transition effect */
 }
 
-.follow-image-container:hover img {
-  opacity: 0.5; /* makes the image darker on hover */
+.explore-follow-image-container:hover img {
+  opacity: 0.5; 
 } 
 
 p a {

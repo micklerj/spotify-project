@@ -1,3 +1,24 @@
+.followed-users-container {
+  justify-content: center;
+  margin-top: 1.5rem;
+  margin-left: auto;
+  margin-right: auto;
+  width: 400px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+  background-color: #fff;
+  padding: 1.25rem;  
+}
+
+.list-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: .5rem;
+  font-size: 1.25rem; 
+  font-weight: 500;
+}
 
 .following-list {
   display: grid;
@@ -29,13 +50,13 @@
   margin-bottom: 0;
 }
 
-.follow-image-container img {
+.following-follow-image-container img {
   width: 25px;
   border-radius: 50%; /* makes the image a circle */
   transition: opacity 0.2s ease-in-out; /* transition effect */
 }
 
-.follow-image-container:hover img {
+.following-follow-image-container:hover img {
   opacity: 0.5; /* makes the image darker on hover */
 } 
 

@@ -10,7 +10,7 @@ router.get('/topArtists', spotifyController.topArtists);
 
 router.get('/topSongs', spotifyController.topSongs);
 
-// router.get('/topGenres', spotifyController.topGenres);
+router.get('/topGenres', spotifyController.topGenres);
 
 router.get('/profileInfo', spotifyController.profileInfo);
 
