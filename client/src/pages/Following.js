@@ -1,4 +1,3 @@
-import Footer from '../components/footerButtons';
 import React, {useState, useEffect, useRef} from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -6,6 +5,7 @@ import followingCheck from '../assets/followingCheck.png';
 import addFollowerIcon from '../assets/addFollowerIcon.png';
 import './styles/Following.css';
 import DisplayRecentlyPlayed from '../components/recentlyPlayed';
+import Footer from '../components/footerButtons';
 
 
 
@@ -229,7 +229,6 @@ function Following() {
           ))}
         </ol>
       </div>
-
 
       <Footer />
     </div>  

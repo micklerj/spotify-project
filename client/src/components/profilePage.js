@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import privateIcon from '../assets/private.png';
 import publicIcon from '../assets/public.png';
@@ -31,9 +32,11 @@ function ProfilePage({displayedUserID}) {
   const [privacy, setPrivacy] = useState(null);
   const [recentlyPlayed, setRecentlyPlayed] = useState([]);
   const [otherUserIsDisplayed, setOtherUserIsDisplayed] = useState(null);
-  const [otherUserIsFollowed, setOtherUserIsFollowed] = useState(false);
+  const [otherUserIsFollowed, setOtherUserIsFollowed] = useState(null);
   const [wasOriginallyFollowed, setWasOriginallyFollowed] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const navigate = useNavigate();
 
   // get profile pic, username, and userID    and   update DB if neccisary 
   useEffect(() => {
@@ -64,12 +67,18 @@ function ProfilePage({displayedUserID}) {
           }
         }
         else {
-          setUserIDDupe(data.id);
           // display user is not the logged in user, get profile from DB   and recently played and privacy
           setOtherUserIsDisplayed(true);
           try {
             const otherUserResponse = await fetch(`/api/getUser?userID=${displayedUserID}`);
             const otherUserData = await otherUserResponse.json();
+            if (otherUserData.message && otherUserData.message === 'User not found') {
+              // unvalid userID  ,   nav to 404 page
+              navigate('/noPage');
+            }
+            else {
+              setUserIDDupe(data.id);
+            }
             setProfilePic(otherUserData.profilePic);
             setUserName(otherUserData.username);
             setRecentlyPlayed(otherUserData.recentlyPlayed);
@@ -87,6 +96,7 @@ function ProfilePage({displayedUserID}) {
               setWasOriginallyFollowed(true);
             }
             else {
+              setOtherUserIsFollowed(false);
               setWasOriginallyFollowed(false);
             }
           } catch (error) {
@@ -409,39 +419,40 @@ function ProfilePage({displayedUserID}) {
   return (
     <div>
       <div className="logout-button-container">
-        {!otherUserIsDisplayed && (
+        {userID && (   
           <button onClick={handleLogout}>Logout</button>
         )}
       </div>
 
-      <div className="profile-container">
-        <img src={profilePic} alt="Profile Picture" className="rounded-circle mr-2 profile-image" />
-        <div className="profile-info">
-          <h1>{userName}</h1>
-          <div>
-            <DisplayRecentlyPlayed songTitle={recentlyPlayed} />
+      {(userID || userIDDupe) && (
+        <div className="profile-container">
+          <img src={profilePic} alt="Profile Picture" className="rounded-circle mr-2 profile-image" />
+          <div className="profile-info">
+            <h1>{userName}</h1>
+            <div>
+              <DisplayRecentlyPlayed songTitle={recentlyPlayed} />
+            </div>
+          </div>
+          <div className="image-container align-right">
+            {(privacy === 'Public' || privacy === 'Private') && !otherUserIsDisplayed && (
+              <img 
+                src={privacy === 'Public' ? publicIcon : privateIcon} 
+                alt="privacy image" 
+                onClick={handleChangePrivacy}
+                title="Change privacy"
+              />
+            )}
+            { otherUserIsDisplayed && (privacy === 'Public' || wasOriginallyFollowed) && (otherUserIsFollowed !== null) && (
+              <img 
+                src={otherUserIsFollowed ? followingCheck : addFollowerIcon} 
+                alt="(un)follow image" 
+                onClick={handleToggleFollow}
+                title={otherUserIsFollowed ? 'unfollow' : 'follow'}
+                />
+            )}
           </div>
         </div>
-        <div className="image-container align-right">
-          {(privacy === 'Public' || privacy === 'Private') && !otherUserIsDisplayed && (
-            <img 
-              src={privacy === 'Public' ? publicIcon : privateIcon} 
-              alt="privacy image" 
-              onClick={handleChangePrivacy}
-              title="Change privacy"
-            />
-          )}
-          { otherUserIsDisplayed && (privacy === 'Public' || wasOriginallyFollowed) && (
-            <img 
-              src={otherUserIsFollowed ? followingCheck : addFollowerIcon} 
-              alt="(un)follow image" 
-              onClick={handleToggleFollow}
-              title={otherUserIsFollowed ? 'unfollow' : 'follow'}
-              />
-          )}
-        </div>
-      </div>
-      
+      )}
       
       {loading ? (
         <div className="loading-container">Loading...</div>

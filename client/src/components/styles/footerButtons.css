@@ -15,23 +15,34 @@
   text-decoration: none;
 }
 
-.footer-button {
+.footer-button {  
   border-radius: 50%;
   width: 30px;
   height: 30px;
   font-size: 10px;
   white-space: nowrap;
-  background-color: rgb(120, 118, 118);
-  border: none;
   color: white;
   text-align: center;
   display: inline-block;
   font-size: 16px;
-  transition-duration: 0.4s;
-  transition: background-color .25s ease-in-out;
-  cursor: pointer;
+  transition: opacity .5s ease-in-out;
+  cursor: pointer;  
 }
 
-.footer-button:hover {
-  background-color: #63686a;
+.active-footer-button {
+  border: #2eb61f 1px solid;
+}
+
+.profile-button:hover {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.following-button:hover {
+  background-image: url('../../assets/following-thick.png');
+  background-size: cover;
+}
+
+.explore-button:hover {
+  background-image: url('../../assets/explore-thick.png');
+  background-size: cover;
 }

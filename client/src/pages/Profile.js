@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import { useParams } from 'react-router-dom';
-import Footer from '../components/footerButtons';
 import ProfilePage from '../components/profilePage';
+import Footer from '../components/footerButtons';
 
 function Profile() {
   const { userID } = useParams();
@@ -11,9 +11,9 @@ function Profile() {
     
     <div className="profile page">
 
-      <ProfilePage displayedUserID={userID} />      
+      <ProfilePage displayedUserID={userID} />   
 
-      <Footer />
+      <Footer />   
       
     </div>
     

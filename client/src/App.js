@@ -6,7 +6,6 @@ import Following from './pages/Following';
 import Explore from './pages/Explore';
 import ProtectedRoute from './components/protectedRoute';
 
-// TODO: switch / to profile and /login to login
 
 import logo from './logo.svg';
 

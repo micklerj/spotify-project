@@ -1,4 +1,3 @@
-import Footer from '../components/footerButtons';
 import React, {useState, useEffect} from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -8,6 +7,7 @@ import addFollowerIcon from '../assets/addFollowerIcon.png';
 import magnifyingGlass from '../assets/magnifyingGlass.png';
 import x from '../assets/x.png';
 import submit from '../assets/submit.png';
+import Footer from '../components/footerButtons';
 import './styles/Explore.css';
 import DisplayRecentlyPlayed from '../components/recentlyPlayed';
 
@@ -361,8 +361,8 @@ function Explore() {
         </InfiniteScroll>
       </div>
 
-
       <Footer />
+
     </div>    
 
 
