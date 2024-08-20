@@ -295,7 +295,9 @@ function Explore() {
 
   return (
     <div className="explore page">
-      <h1>  Explore Page </h1>
+      <div className='explore-title'>
+        Explore
+      </div>
 
       <div className="search-bar">
         <img src={magnifyingGlass} alt="Search" />
@@ -330,12 +332,12 @@ function Explore() {
           loader={<h4>Loading...</h4>}
         >
           <div className='explore-users-container'>
-            <ol className="following-list">
+            <ol className="explore-list">
               {displayList.map((user, index) => (
-                <li key={index} className="following-item">
-                  <div className="following-item-content">
-                    <img src={user.profilePic} alt="profile pic" className="following-item-image" />
-                    <div className="following-item-info">
+                <li key={index} className="explore-item">
+                  <div className="explore-item-content">
+                    <img src={user.profilePic} alt="profile pic" className="explore-item-image" />
+                    <div className="explore-item-info">
                       <p>
                         <Link to={`/profile/${user.userID}`}>
                           {user.userName}

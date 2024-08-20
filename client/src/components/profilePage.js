@@ -417,23 +417,20 @@ function ProfilePage({displayedUserID}) {
   }
 
   return (
-    <div>
-      <div className="logout-button-container">
-        {userID && (   
-          <button onClick={handleLogout}>Logout</button>
-        )}
-      </div>
+    <div>      
 
       {(userID || userIDDupe) && (
         <div className="profile-container">
-          <img src={profilePic} alt="Profile Picture" className="rounded-circle mr-2 profile-image" />
-          <div className="profile-info">
-            <h1>{userName}</h1>
-            <div>
-              <DisplayRecentlyPlayed songTitle={recentlyPlayed} />
+          <div className="profile-content">
+            <img src={profilePic} alt="Profile Picture" className="profile-image" />
+            <div className="profile-info">
+              <h1 className="username">{userName}</h1>
+              <div className="song">
+                <DisplayRecentlyPlayed songTitle={recentlyPlayed} />
+              </div>
             </div>
           </div>
-          <div className="image-container align-right">
+          <div className="image-container">
             {(privacy === 'Public' || privacy === 'Private') && !otherUserIsDisplayed && (
               <img 
                 src={privacy === 'Public' ? publicIcon : privateIcon} 
@@ -448,10 +445,44 @@ function ProfilePage({displayedUserID}) {
                 alt="(un)follow image" 
                 onClick={handleToggleFollow}
                 title={otherUserIsFollowed ? 'unfollow' : 'follow'}
-                />
+              />
+            )}
+          </div>
+
+          <div className="logout-button-container">
+            {userID && (   
+              <button onClick={handleLogout}>Logout</button>
             )}
           </div>
         </div>
+
+        // <div className="profile-container">
+        //   <img src={profilePic} alt="Profile Picture" className="rounded-circle mr-2 profile-image" />
+        //   <div className="profile-info">
+        //     <h1>{userName}</h1>
+        //     <div>
+        //       <DisplayRecentlyPlayed songTitle={recentlyPlayed} />
+        //     </div>
+        //   </div>
+        //   <div className="image-container align-right">
+        //     {(privacy === 'Public' || privacy === 'Private') && !otherUserIsDisplayed && (
+        //       <img 
+        //         src={privacy === 'Public' ? publicIcon : privateIcon} 
+        //         alt="privacy image" 
+        //         onClick={handleChangePrivacy}
+        //         title="Change privacy"
+        //       />
+        //     )}
+        //     { otherUserIsDisplayed && (privacy === 'Public' || wasOriginallyFollowed) && (otherUserIsFollowed !== null) && (
+        //       <img 
+        //         src={otherUserIsFollowed ? followingCheck : addFollowerIcon} 
+        //         alt="(un)follow image" 
+        //         onClick={handleToggleFollow}
+        //         title={otherUserIsFollowed ? 'unfollow' : 'follow'}
+        //         />
+        //     )}
+        //   </div>
+        // </div>
       )}
       
       {loading ? (

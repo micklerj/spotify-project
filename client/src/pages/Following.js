@@ -197,8 +197,7 @@ function Following() {
 
   //TODO: implement search and infinite scroll
   return (
-    <div className="following page">
-      <h1>  Following Page </h1>
+    <div className="following-page">
 
       <div className='followed-users-container'>
         <div className='list-title'>

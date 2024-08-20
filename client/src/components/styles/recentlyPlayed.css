@@ -1,6 +1,6 @@
 .song-title-container {
   margin-left: 5px;
-  width: 200px;
+  width: 150px;
   overflow: hidden;
   white-space: nowrap;
   position: relative;
@@ -14,5 +14,5 @@
 
 .song-title {
   white-space: nowrap;
-  font-size: 14px;
+  font-size: 11px;
 }

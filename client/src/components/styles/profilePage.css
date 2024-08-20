@@ -1,42 +1,61 @@
+/* ------------------ profile ------------------ */
 .profile-container {
   display: flex;
-  flex-wrap: wrap;
-  margin-left: 50px;
-  margin-top: 10px;
-  background-color: light;
+  justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  /* padding: 0 50px; */
+  margin-top: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.profile-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: center;
 }
 
 .profile-image {
-  width: 200px;
+  width: 29%;
+  max-width: 200px; 
   border-radius: 50%;
-  margin-right: .5rem;
 }
 
 .profile-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   margin-left: 20px;
+  width: 190px;
 }
 
-.align-right {
-  position: absolute;
-  right: 5%;
+/* TODO: fix long names by making font smaller or something */
+.username {
+  font-size: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  margin: 7px 0;
+  width: 150px;
 }
 
 .image-container img {
+  position: absolute;
+  right: 7%;
+  top: 50%;
+  transform: translateY(-50%);
   width: 25px;
-  border-radius: 50%; /* makes the image a circle */
-  cursor: pointer;
-  transition: opacity 0.2s ease-in-out; /* transition effect */
-}
-
-.image-container:hover img {
-  opacity: 0.5; /* makes the image darker on hover */
+  border-radius: 50%;
 }
 
 .logout-button-container {
   position: absolute;
   top: 10px;
-  right: 10px;
+  right: 7%;
 }
 
 .logout-button-container button {
@@ -53,11 +72,10 @@
 .logout-button-container button:hover {
   background-color: #dadcde;
 }
-
+/* ------------------- body ------------------- */
 .body-container {
   width: 100%;
-  padding-right: 15px;
-  padding-left: 15px;
+  /* padding: 0 50px; */
   margin-right: auto;
   margin-left: auto;
   margin-bottom: 100px;
@@ -72,16 +90,16 @@
 
 /* top items */
 .top-items-container {
+  box-sizing: border-box; 
   justify-content: center;
-  margin-top: 1.5rem;
-  margin-left: auto;
-  margin-right: auto;
-  width: 400px;
+  margin: .7rem auto;
+  width: 100%; /* Updated */
+  max-width: 455px;
   border: 1px solid #ddd;
   border-radius: 5px;
   overflow: hidden;
   background-color: #fff;
-  padding: 1.25rem;  
+  padding: 20px ;  
 }
 
 .items-header {
@@ -142,6 +160,7 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 15px;
+  padding: 0;
 }
 
 .artist-item {
@@ -161,20 +180,23 @@
 
 .artist-item-image {
   width: 50px;
-  margin-right: 10px;
-  margin-left: 10px;
+  margin: 0 10px;
   border-radius: 50%;
 }
 
 .artist-item-link {
   color: black;
   text-decoration: none;
+  /* white-space: normal;
+  overflow-wrap: break-word;  */
+  word-break: break-word;
 }
 
 
 /* top songs list */
 .song-list {
   list-style-type: none;
+  padding: 0;
 }
 
 .song-item {
@@ -215,6 +237,7 @@
 /* genre list */
 .genre-list {
   list-style-type: none;
+  padding: 0;
 }
 
 .genre-item-content {
