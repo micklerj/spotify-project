@@ -2,13 +2,13 @@ const request = require('request');
 const crypto = require('crypto');
 const querystring = require('querystring');
 const axios = require('axios');
+const axiosRetry = require('axios-retry').default;
 require('dotenv').config();
 const qs = require('qs');
 
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = 'http://localhost:3500/api/callback'
-
 
 var stateKey = 'spotify_auth_state';
 
@@ -18,6 +18,21 @@ const generateRandomString = (length) => {
   .toString('hex')
   .slice(0, length);
 }
+
+// Create an instance of axios with retry
+const axiosInstance = axios.create();
+axiosRetry(axiosInstance, {
+  retries: 5, // number of retries
+  retryDelay: (retryCount) => {
+    return retryCount * 1000; // time interval between retries
+  },
+  retryCondition: (error) => {
+    // retry only if the status code is 429
+    return error.response && error.response.status === 429;
+  }
+});
+
+
 
 // spotify authorization
 login = function(req, res) {
@@ -141,42 +156,47 @@ topArtists = function(req, res) {
     headers: { 
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + req.session.accessToken 
-    },
-    json: true 
+    }
   };
 
-  request.get(options, async function(error, response, body) {
-    // update database if init is true (first rendering of the user's profile)
-    if (init) {
-      // get user ID
-      const profileBody = await getProfileInfo(req.session.accessToken);
-      var userID = profileBody.id;
+  axios.get(options.url, { headers: options.headers })
+    .then(async function(response) {
+      var body = response.data;
+      console.log(body);
+      // update database if init is true (first rendering of the user's profile)
+      if (init) {
+        // get user ID
+        const profileBody = await getProfileInfo(req.session.accessToken);
+        var userID = profileBody.id;
 
-      // set timeframe for updated database content
-      var topArtistsTime = '';
-      if      (timeFrame === 'short_term')  { topArtistsTime = 'topArtists1M'; }
-      else if (timeFrame === 'medium_term') { topArtistsTime = 'topArtists6M'; }
-      else                                  { topArtistsTime = 'topArtists1Y'; }
+        // set timeframe for updated database content
+        var topArtistsTime = '';
+        if      (timeFrame === 'short_term')  { topArtistsTime = 'topArtists1M'; }
+        else if (timeFrame === 'medium_term') { topArtistsTime = 'topArtists6M'; }
+        else                                  { topArtistsTime = 'topArtists1Y'; }
 
-      // create array of song objects
-      const artistArray = body.items.map(item => ({
-        artistName: item.name,
-        image: item.images[0].url,
-        url: item.external_urls.spotify
-      }));
+        // create array of song objects
+        const artistArray = body.items.map(item => ({
+          artistName: item.name,
+          image: item.images[0].url,
+          url: item.external_urls.spotify
+        }));
 
-      const putData = {
-        "userID": userID,
-        [topArtistsTime]: artistArray
+        const putData = {
+          "userID": userID,
+          [topArtistsTime]: artistArray
+        }
+
+        axios.put('http://localhost:3500/api/updateUser', putData)
+          .catch((error) => { 
+            console.error('Error:', error);
+          })
       }
-
-      axios.put('http://localhost:3500/api/updateUser', putData)
-        .catch((error) => { 
-          console.error('Error:', error);
-        })
-    }
-    res.json(body);
-  });
+      res.json(body);
+    })
+    .catch(function(error) {
+      console.error('Error:', error);
+    });
 };
 
 // get request for top songs
@@ -194,43 +214,48 @@ topSongs = function(req, res) {
     headers: { 
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + req.session.accessToken 
-    },
-    json: true 
+    }
   };
 
-  request.get(options, async function(error, response, body) { 
-    // update database if init is true (first rendering of the user's profile)
-    if (init) {
-      // get user ID
-      const profileBody = await getProfileInfo(req.session.accessToken);
-      var userID = profileBody.id;
+  axios.get(options.url, { headers: options.headers })
+    .then(async function(response) {
+      var body = response.data;
+      // console.log(body);
+      // update database if init is true (first rendering of the user's profile)
+      if (init) {
+        // get user ID
+        const profileBody = await getProfileInfo(req.session.accessToken);
+        var userID = profileBody.id;
 
-      // set timeframe for updated database content
-      var topSongsTime = '';
-      if      (timeFrame === 'short_term')  { topSongsTime = 'topSongs1M'; }
-      else if (timeFrame === 'medium_term') { topSongsTime = 'topSongs6M'; }
-      else                                  { topSongsTime = 'topSongs1Y'; }
+        // set timeframe for updated database content
+        var topSongsTime = '';
+        if      (timeFrame === 'short_term')  { topSongsTime = 'topSongs1M'; }
+        else if (timeFrame === 'medium_term') { topSongsTime = 'topSongs6M'; }
+        else                                  { topSongsTime = 'topSongs1Y'; }
 
-      // create array of song objects
-      const songArray = body.items.map(item => ({
-        songName: item.name,
-        artistName: item.artists[0].name,
-        image: item.album.images[0].url,
-        url: item.external_urls.spotify
-      }));
+        // create array of song objects
+        const songArray = body.items.map(item => ({
+          songName: item.name,
+          artistName: item.artists[0].name,
+          image: item.album.images[0].url,
+          url: item.external_urls.spotify
+        }));
 
-      const putData = {
-        "userID": userID,
-        [topSongsTime]: songArray
+        const putData = {
+          "userID": userID,
+          [topSongsTime]: songArray
+        }
+
+        axios.put('http://localhost:3500/api/updateUser', putData)
+          .catch((error) => { 
+            console.error('Error:', error);
+          })
       }
-
-      axios.put('http://localhost:3500/api/updateUser', putData)
-        .catch((error) => { 
-          console.error('Error:', error);
-        })
-    }
-    res.json(body);
-  });
+      res.json(body);
+    })
+    .catch(function(error) {
+      console.error('Error:', error);
+    });
 };
 
 // get request for top genres
@@ -239,8 +264,9 @@ topGenres = async function(req, res) {
   var init = req.query.init === 'true'; 
 
   var genreRanks = new Map();
+  var artistIDs = '';
 
-  // get top 50 songs -> song's artist -> artist's genres
+  // get top 50 songs 
   var options = {
     url: 'https://api.spotify.com/v1/me/top/tracks?' +
       querystring.stringify({
@@ -258,26 +284,34 @@ topGenres = async function(req, res) {
     const response = await axios.get(options.url, { headers: options.headers });
     await Promise.all(response.data.items.map(async (item, index) => {
       const artistID = item.artists[0].id;
-      var artistOptions = {
-        url: `https://api.spotify.com/v1/artists/${artistID}`,
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + req.session.accessToken 
-        }
-      };
-  
-      try {
-        const artistResponse = await axios.get(artistOptions.url, { headers: artistOptions.headers });
-        artistResponse.data.genres.forEach(genre => {
-          // Add points to the genre in the map
-          var points = genreRanks.get(genre) || 0;
-          points += 50 - index;
-          genreRanks.set(genre, points);
-        });
-      } catch (error) {
-        console.error(error);
+      // add each artistID to artistIDs string
+      if (artistIDs !== '') {
+        artistIDs += ',';
       }
+      artistIDs += artistID;
     }));
+  } catch (error) {
+    console.error(error);
+  }
+
+  // get artists of the top 50 songs,  get their genres, and add points to the genresRanks
+  var artistOptions = {
+    url: `https://api.spotify.com/v1/artists/${artistIDs}`,
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + req.session.accessToken 
+    }
+  };
+  try {
+    const artistResponse = await axios.get(artistOptions.url, { headers: artistOptions.headers });
+    artistResponse.data.artists.forEach((artist, index) => {
+      artist.genres.forEach(genre => {
+        // Add points to the genre in the map
+        var points = genreRanks.get(genre) || 0;
+        points += 50 - index;
+        genreRanks.set(genre, points);
+      });
+    });
   } catch (error) {
     console.error(error);
   }
@@ -365,16 +399,16 @@ function getProfileInfo(accessToken) {
   return new Promise((resolve, reject) => {
     var options = {
       url: 'https://api.spotify.com/v1/me',
-      headers: { 'Authorization': 'Bearer ' + accessToken },
-      json: true 
+      headers: { 'Authorization': 'Bearer ' + accessToken }
     };
 
-    request.get(options, function(error, response, body) {   // TODO: switch all requests to axios
-      if (error) {
+    axios.get(options.url, { headers: options.headers })
+      .then(function(response) {
+        resolve(response.data);
+      })
+      .catch(function(error) {
         reject(error);
-      }
-      resolve(body);
-    });
+      });
   });
 }
 
@@ -438,33 +472,23 @@ followCheck = function(req, res) {
     headers: { 
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + req.session.accessToken 
-    },
-    json: true 
+    }
   };
   console.log(options);
 
-  request.get(options, async function(error, response, body) {   
-    if (error) {
+  axios.get(options.url, { headers: options.headers })
+    .then(function(response) {
+      console.log(response.data);
+      res.json(response.data);
+    })
+    .catch(function(error) {
       console.error('Error:', error);
-      res.status(500).json({ error: 'Failed to fetch from Spotify API' });
-      return;
-    }
-  
-    if (response.statusCode !== 200) {
-      console.error('Error:', response.statusCode, body);
-      res.status(response.statusCode).json({ error: 'Failed to fetch from Spotify API' });
-      return;
-    }
-  
-    if (body === undefined) {
-      console.error('Error: body is undefined');
-      res.status(500).json({ error: 'No data returned from Spotify API' });
-      return;
-    }
-  
-    console.log(body);
-    res.json(body);
-  });
+      if (error.response) {
+        res.status(error.response.status).json({ error: 'Failed to fetch from Spotify API' });
+      } else {
+        res.status(500).json({ error: 'Failed to fetch from Spotify API' });
+      }
+    });
 }
 
 // follow user on spotify
@@ -479,13 +503,21 @@ follow = function(req, res) {
     headers: { 
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + req.session.accessToken 
-    },
-    json: true 
+    }
   };
 
-  request.put(options, async function(error, response, body) {   
-    res.json({status: 'successfully followed user'});
-  });
+  axios.put(options.url, {}, { headers: options.headers })
+    .then(function(response) {
+      res.json({status: 'successfully followed user'});
+    })
+    .catch(function(error) {
+      console.error('Error:', error);
+      if (error.response) {
+        res.status(error.response.status).json({ error: 'Failed to follow user' });
+      } else {
+        res.status(500).json({ error: 'Failed to follow user' });
+      }
+    });
 }
 
 // unfollow user on spotify
@@ -500,13 +532,21 @@ unfollow = function(req, res) {
     headers: { 
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + req.session.accessToken 
-    },
-    json: true 
+    }
   };
 
-  request.delete(options, async function(error, response, body) {   
-    res.json({status: 'successfully unfollowed user'});
-  });
+  axios.delete(options.url, { headers: options.headers })
+    .then(function(response) {
+      res.json({status: 'successfully unfollowed user'});
+    })
+    .catch(function(error) {
+      console.error('Error:', error);
+      if (error.response) {
+        res.status(error.response.status).json({ error: 'Failed to unfollow user' });
+      } else {
+        res.status(500).json({ error: 'Failed to unfollow user' });
+      }
+    });
 }
 
 // get recently played songs
@@ -520,13 +560,21 @@ getRecentlyPlayed = function(req, res) {
     headers: { 
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + req.session.accessToken 
-    },
-    json: true 
+    }
   };
 
-  request.get(options, async function(error, response, body) {   
-    res.json(body);
-  });
+  axios.get(options.url, { headers: options.headers })
+    .then(function(response) {
+      res.json(response.data);
+    })
+    .catch(function(error) {
+      console.error('Error:', error);
+      if (error.response) {
+        res.status(error.response.status).json({ error: 'Failed to fetch recently played' });
+      } else {
+        res.status(500).json({ error: 'Failed to fetch recently played' });
+      }
+    });
 }
 
 module.exports = { login, callback, topArtists, topSongs, topGenres, profileInfo, test, ensureAuth, followCheck, follow, unfollow, getRecentlyPlayed };

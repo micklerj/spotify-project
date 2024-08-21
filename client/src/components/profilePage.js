@@ -45,7 +45,7 @@ function ProfilePage({displayedUserID}) {
         const response = await fetch('/api/profileInfo');
         const data = await response.json();    
   
-        if (displayedUserID === undefined || displayedUserID === data.id) {  
+        if (data.id && (displayedUserID === undefined || displayedUserID === data.id)) {  
           setOtherUserIsDisplayed(false);
           setWasOriginallyFollowed(false);  // doesn't matter, but need this line in order for loading to finish
           setUserID(data.id); 
@@ -66,7 +66,7 @@ function ProfilePage({displayedUserID}) {
             console.error('Error:', error);
           }
         }
-        else {
+        else if (displayedUserID) {
           // display user is not the logged in user, get profile from DB   and recently played and privacy
           setOtherUserIsDisplayed(true);
           try {
@@ -205,9 +205,9 @@ function ProfilePage({displayedUserID}) {
   // get top artists
   async function handleTopArtists(timeFrame, count, init = false, loadOnPage = true) {
     if (userID) {
-      fetch(`/api/topArtists?timeFrame=${timeFrame}&count=${count}&init=${init}`)
-        .then(response => response.json())
-        .then(data => {
+      axios.get(`/api/topArtists?timeFrame=${timeFrame}&count=${count}&init=${init}`)
+        .then(response => {
+          const data = response.data;
           if (loadOnPage) {
             console.log(data);
             setArtists(data.items.map(item => item.name));
@@ -219,7 +219,7 @@ function ProfilePage({displayedUserID}) {
           console.error('Error:', error); 
         });
     }
-    else {
+    else if (displayedUserID){
 
       // timeframe for database content
       var topArtistsTime = '';
@@ -259,7 +259,7 @@ function ProfilePage({displayedUserID}) {
           console.error('Error:', error); 
         });
     }
-    else {
+    else if (displayedUserID) {
 
       // timeframe for database content
       var topSongsTime = '';
@@ -288,6 +288,7 @@ function ProfilePage({displayedUserID}) {
       fetch(`/api/topGenres?timeFrame=${timeFrame}&init=${init}`)
         .then(response => response.json())
         .then(data => {
+          console.log(timeFrame,' genres: ',data);
           if (loadOnPage) {
             var newGenres = data.map(pair => pair[0]);
             setGenres(newGenres);
@@ -298,7 +299,7 @@ function ProfilePage({displayedUserID}) {
           console.error('Error:', error); 
         });
     }
-    else {
+    else if (displayedUserID) {
       // timeframe for database content
       var topGenresTime = '';
       if      (timeFrame === 'short_term')  { topGenresTime = 'topGenres1M'; }
@@ -455,34 +456,6 @@ function ProfilePage({displayedUserID}) {
             )}
           </div>
         </div>
-
-        // <div className="profile-container">
-        //   <img src={profilePic} alt="Profile Picture" className="rounded-circle mr-2 profile-image" />
-        //   <div className="profile-info">
-        //     <h1>{userName}</h1>
-        //     <div>
-        //       <DisplayRecentlyPlayed songTitle={recentlyPlayed} />
-        //     </div>
-        //   </div>
-        //   <div className="image-container align-right">
-        //     {(privacy === 'Public' || privacy === 'Private') && !otherUserIsDisplayed && (
-        //       <img 
-        //         src={privacy === 'Public' ? publicIcon : privateIcon} 
-        //         alt="privacy image" 
-        //         onClick={handleChangePrivacy}
-        //         title="Change privacy"
-        //       />
-        //     )}
-        //     { otherUserIsDisplayed && (privacy === 'Public' || wasOriginallyFollowed) && (otherUserIsFollowed !== null) && (
-        //       <img 
-        //         src={otherUserIsFollowed ? followingCheck : addFollowerIcon} 
-        //         alt="(un)follow image" 
-        //         onClick={handleToggleFollow}
-        //         title={otherUserIsFollowed ? 'unfollow' : 'follow'}
-        //         />
-        //     )}
-        //   </div>
-        // </div>
       )}
       
       {loading ? (
@@ -495,7 +468,7 @@ function ProfilePage({displayedUserID}) {
             <div className="top-items-container">
               <div className="items-header">
                 Top Artists
-                <div class="buttons-container">
+                <div className="buttons-container">
                   <button 
                     className={`button time-frame-button ${artistTimeFrame === 'short_term' ? 'active-button' : ''}`}
                     onClick={() => {
@@ -550,7 +523,7 @@ function ProfilePage({displayedUserID}) {
             <div className="top-items-container">
               <div className="items-header">
                 Top Songs
-                <div class="buttons-container">
+                <div className="buttons-container">
                   <button 
                     className={`button time-frame-button ${songTimeFrame === 'short_term' ? 'active-button' : ''}`}
                     onClick={() => {
@@ -608,7 +581,7 @@ function ProfilePage({displayedUserID}) {
             <div className="top-items-container">
               <div className="items-header">
                 Top Genres
-                <div class="buttons-container">
+                <div className="buttons-container">
                   <button 
                     className={`button time-frame-button ${genreTimeFrame === 'short_term' ? 'active-button' : ''}`}
                     onClick={() => {

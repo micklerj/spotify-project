@@ -18,10 +18,13 @@ function Following() {
     //   profilePic: '',
     //   userName: '',
     //   recentlyListenedTo: '',
+    //   privacy: '',
     //   isFollowing: true,
     // }
   ]);
   const hasRun = useRef(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [confirmationUserID, setConfirmationUserID] = useState(null);
 
 
 
@@ -67,6 +70,7 @@ function Following() {
                 profilePic: data.profilePic,
                 userName: data.username,
                 recentlyListenedTo: data.recentlyPlayed,
+                privacy: data.privacy,
                 isFollowing: true,                       
               }
             ]);
@@ -218,16 +222,50 @@ function Following() {
                 </div>
               </div>
               <div className="following-follow-image-container">
+              {user.userID !== userID && (user.privacy !== 'Private' || user.isFollowing) && (
                 <img 
                   src={user.isFollowing ? followingCheck : addFollowerIcon} 
                   alt="Button image" 
-                  onClick={() => handleToggleFollow(user.userID, user.isFollowing)}
+                  onClick={() => {
+                    if (user.privacy === 'Private' && user.isFollowing) {
+                      setConfirmationUserID(user.userID);
+                      setShowConfirmation(true);              
+                    } else {
+                      handleToggleFollow(user.userID, user.isFollowing);
+                    }
+                  }}
                 />
+              )}
               </div>
             </li>
           ))}
         </ol>
       </div>
+
+      {showConfirmation && (
+        <>
+          <div className="fol-overlay" onClick={() => setShowConfirmation(false)}></div>
+
+          <div className="fol-confirmation">
+            <p>Are you sure you want to unfollow? This user is private and can't be re-followed.</p>
+            <div className='fol-confirm-buttons'>
+              <button 
+                className="fol-confirm-button"
+                onClick={() => {
+                  handleToggleFollow(confirmationUserID, true);
+                  setShowConfirmation(false);
+                }}>
+                Yes
+              </button>
+              <button 
+                className="fol-confirm-button"
+                onClick={() => setShowConfirmation(false)}>
+                No
+              </button>
+            </div>
+          </div>
+        </>
+      )}
 
       <Footer />
     </div>  

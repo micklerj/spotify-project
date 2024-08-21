@@ -50,6 +50,7 @@
   margin: 0;
   max-width: 235px;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .following-follow-image-container img {
@@ -69,4 +70,48 @@ p a {
 
 p a:hover {
   color: dimgray;
+}
+
+.fol-confirmation {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  z-index: 1000;
+}
+
+.fol-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.fol-confirm-buttons {
+  display: flex;
+  justify-content: center;
+}
+
+.fol-confirm-button {
+  display: inline-block;
+  padding: 10px 20px;
+  margin: 0 5px;
+  border-radius: 50px;
+  border: none;
+  background-color: #f0f0f0;
+  color: #000;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.2s ease-in-out; 
+}
+
+.fol-confirm-button:hover {
+  background-color: #e6e6e6; 
 }

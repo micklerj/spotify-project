@@ -31,8 +31,8 @@ function Explore() {
   const [searchInput, setSearchInput] = useState('');
   const [inputHandled, setInputHandled] = useState(false);
   const [initialListLoaded, setInitialListLoaded] = useState(false);
-
-
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [confirmationUserID, setConfirmationUserID] = useState(null);
   
 
 
@@ -308,7 +308,7 @@ function Explore() {
             setSearchInput(e.target.value);
             setInputHandled(false);
           }}
-          onKeyPress={e => {
+          onKeyDown={e => {
             if (e.key === 'Enter') {
               handleInput(); 
             }
@@ -347,11 +347,18 @@ function Explore() {
                     </div>
                   </div>
                   <div className="explore-follow-image-container">
-                    {user.userID !== userID && user.privacy !== 'Private' && (
+                    {user.userID !== userID && (user.privacy !== 'Private' || user.isFollowing) && (
                       <img 
                         src={user.isFollowing ? followingCheck : addFollowerIcon} 
                         alt="Button image" 
-                        onClick={() => handleToggleFollow(user.userID, user.isFollowing)}
+                        onClick={() => {
+                          if (user.privacy === 'Private' && user.isFollowing) {
+                            setConfirmationUserID(user.userID);
+                            setShowConfirmation(true);              
+                          } else {
+                            handleToggleFollow(user.userID, user.isFollowing);
+                          }
+                        }}
                       />
                     )}
                   </div>
@@ -362,6 +369,31 @@ function Explore() {
           {<div style={{ height: '100vh' }} />} {/* Placeholder */}
         </InfiniteScroll>
       </div>
+
+      {showConfirmation && (
+        <>
+          <div className="exp-overlay" onClick={() => setShowConfirmation(false)}></div>
+
+          <div className="exp-confirmation">
+            <p>Are you sure you want to unfollow? This user is private and can't be re-followed.</p>
+            <div className="exp-confirm-buttons">
+              <button 
+                className="exp-confirm-button"
+                onClick={() => {
+                  handleToggleFollow(confirmationUserID, true);
+                  setShowConfirmation(false);
+                }}>
+                Yes
+              </button>
+              <button 
+                className="exp-confirm-button"
+                onClick={() => setShowConfirmation(false)}>
+                No
+              </button>
+            </div>
+          </div>
+        </>
+      )}
 
       <Footer />
 
