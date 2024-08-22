@@ -31,8 +31,10 @@ function Explore() {
   const [searchInput, setSearchInput] = useState('');
   const [inputHandled, setInputHandled] = useState(false);
   const [initialListLoaded, setInitialListLoaded] = useState(false);
+  const [loadFromDB, setLoadFromDB] = useState(true);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [confirmationUserID, setConfirmationUserID] = useState(null);
+  const [inputSearched, setInputSearched] = useState(false);
   
 
 
@@ -252,16 +254,19 @@ function Explore() {
     }
   }
 
+  // searching for a user
   async function handleInput() {
-    console.log(searchInput);
+    setInputSearched(false);
     // clear current userID and display list
     setuserIDList([]);
     setDisplayList([]);
 
     if (searchInput === '') {
       getDisplayUsers(0);   // gets default users
+      setLoadFromDB(true);
     }
     else {
+      setLoadFromDB(false);
       setInputHandled(true);
       try {
         const getData = {
@@ -276,7 +281,7 @@ function Explore() {
           userIDList.push(user.userID);
         });
         setuserIDList(userIDList);
-
+        setInputSearched(true);
       } catch (error) {
         console.error(error);
       }   
@@ -285,6 +290,8 @@ function Explore() {
 
   // clear the search input and get default users
   async function handleClearInput() {
+    setInputSearched(false);
+    setLoadFromDB(true);
     setInputHandled(false);
     setSearchInput('');
     setuserIDList([]);
@@ -321,16 +328,23 @@ function Explore() {
         </button>
       </div>
 
+      {userIDList.length === 0 && inputSearched && (
+        <div className='no-users-found'>
+          No users found :(
+        </div>
+      )}
+
       <div >
         <InfiniteScroll
           dataLength={displayList.length}
           next={() => {
-            if (DBindex < userCount) {
+            if (DBindex < userCount && loadFromDB) {
               getDisplayUsers(DBindex);
             }
           }}
           hasMore={true}
           loader={<h4>Loading...</h4>}
+          scrollThreshold={0.5}
         >
           <div className='explore-users-container'>
             <ol className="explore-list">
