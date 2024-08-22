@@ -304,6 +304,7 @@ function Explore() {
         <input
           type="text"
           value={searchInput}
+          className='search-bar-input'
           onChange={e => {
             setSearchInput(e.target.value);
             setInputHandled(false);
@@ -339,7 +340,7 @@ function Explore() {
                     <img src={user.profilePic} alt="profile pic" className="explore-item-image" />
                     <div className="explore-item-info">
                       <p>
-                        <Link to={`/profile/${user.userID}`}>
+                        <Link to={`/profile/${user.userID}`} className="exp-username-link">
                           {user.userName}
                         </Link>
                       </p>

@@ -214,7 +214,7 @@ function Following() {
                 <img src={user.profilePic} alt="profile pic" className="following-item-image" />
                 <div className="following-item-info">
                   <p>
-                    <Link to={`/profile/${user.userID}`}>
+                    <Link to={`/profile/${user.userID}`} className="username-link">
                       {user.userName}
                     </Link>
                   </p>

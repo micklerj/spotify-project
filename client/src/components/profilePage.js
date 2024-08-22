@@ -209,7 +209,7 @@ function ProfilePage({displayedUserID}) {
         .then(response => {
           const data = response.data;
           if (loadOnPage) {
-            console.log(data);
+            // console.log(data);
             setArtists(data.items.map(item => item.name));
             setArtistPics(data.items.map(item => item.images[0].url));
             setArtistURLs(data.items.map(item => item.external_urls.spotify));
@@ -248,7 +248,7 @@ function ProfilePage({displayedUserID}) {
         .then(response => response.json())
         .then(data => {
           if (loadOnPage) {
-            console.log(data);
+            // console.log(data);
             setSongs(data.items.map(item => item.name));
             setSongPics(data.items.map(item => item.album.images[0].url));
             setSongSingers(data.items.map(item => item.artists[0].name));
@@ -288,7 +288,7 @@ function ProfilePage({displayedUserID}) {
       fetch(`/api/topGenres?timeFrame=${timeFrame}&init=${init}`)
         .then(response => response.json())
         .then(data => {
-          console.log(timeFrame,' genres: ',data);
+          // console.log(timeFrame,' genres: ',data);
           if (loadOnPage) {
             var newGenres = data.map(pair => pair[0]);
             setGenres(newGenres);
@@ -418,7 +418,7 @@ function ProfilePage({displayedUserID}) {
   }
 
   return (
-    <div>      
+    <div className='color-border'>      
 
       {(userID || userIDDupe) && (
         <div className="profile-container">
@@ -578,7 +578,7 @@ function ProfilePage({displayedUserID}) {
               </div>
             </div>
 
-            <div className="top-items-container">
+            <div className="top-items-container top-genre-container">
               <div className="items-header">
                 Top Genres
                 <div className="buttons-container">

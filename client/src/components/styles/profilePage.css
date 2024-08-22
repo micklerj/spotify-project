@@ -1,6 +1,42 @@
 
+/* effecting every page */
 body {
-  background-color: #f0f0f0;
+  background-color: #2b2b2b;
+}
+
+/* color border */
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.color-border {
+  position: relative;
+  width: 100%; 
+  max-width: 455px;
+  padding: 2px 2px 57.5px; /* width of border */
+  margin: 0 auto;
+}
+
+.color-border::before {
+  content: "";
+  position: absolute;
+  /* border-radius: 8px; */
+  top: 0; 
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-image: linear-gradient(45deg, #12314c, #141f54, #4a2c73, #7a4880, #b76cb5);
+  background-size: 200% 200%;
+  z-index: -1;
+  animation: gradient 10s ease infinite;
 }
 
 /* ------------------ profile ------------------ */
@@ -12,10 +48,10 @@ body {
   position: relative;
   width: 100%;
   max-width: 500px;
-  /* padding: 0 50px; */
-  margin-top: 15px;
-  margin-right: auto;
-  margin-left: auto;
+  padding: 15px 0 ;
+  margin: 0 auto;
+  background-color: #353535;
+  border-radius: 8px;
 }
 
 .profile-content {
@@ -42,6 +78,7 @@ body {
 /* TODO: fix long names by making font smaller or something */
 .username {
   font-size: 20px;
+  color: #f0f0f0;
   white-space: nowrap;
   overflow: hidden;
   margin: 7px 0;
@@ -78,32 +115,31 @@ body {
   background-color: #dadcde;
 }
 /* ------------------- body ------------------- */
-.body-container {
-  width: 100%;
-  /* padding: 0 50px; */
-  margin-right: auto;
-  margin-left: auto;
-  margin-bottom: 100px;
-}
-
 .loading-container {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 30vh;
+  color: #f0f0f0;
 }
 
 /* top items */
+.body-container {
+  width: 100%;
+  /* padding: 0 50px; */
+  margin: 0 auto;
+}
+
 .top-items-container {
   box-sizing: border-box; 
   justify-content: center;
-  margin: .7rem auto;
-  width: 100%; /* Updated */
+  margin: 2px auto 0 auto;
+  width: 100%; 
   max-width: 455px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  /* border: 1px solid #ddd; */
+  border-radius: 8px;
   overflow: hidden;
-  background-color: #fff;
+  background-color: #2b2b2b;
   padding: 20px ;  
 }
 
@@ -114,6 +150,7 @@ body {
   margin-bottom: .5rem;
   font-size: 1.25rem; 
   font-weight: 500;
+  color: #f0f0f0;
 }
 
 .buttons-container {
@@ -176,6 +213,7 @@ body {
 .artist-item-index {
   width: 20px;
   text-align: right;
+  color: #f0f0f0;
 }
 
 .artist-item-content {
@@ -190,11 +228,13 @@ body {
 }
 
 .artist-item-link {
-  color: black;
+  color: #f0f0f0;
   text-decoration: none;
-  /* white-space: normal;
-  overflow-wrap: break-word;  */
   word-break: break-word;
+}
+
+.artist-item-link:hover {
+  color: #c6c6c6;
 }
 
 
@@ -219,6 +259,7 @@ body {
 .song-item-index {
   width: 20px;
   text-align: right;
+  color: #f0f0f0;
 }
 
 .song-item-info {
@@ -226,12 +267,18 @@ body {
   flex-direction: column;
   justify-content: flex-start;
   margin-left: 10px;
+  color: #f0f0f0;
+
 }
 
 .song-item-link {
-  color: black;
+  color: #f0f0f0;
   text-decoration: none;
-  font-weight: bold;
+  font-weight: 780;
+}
+
+.song-item-link:hover {
+  color: #c6c6c6;
 }
 
 .song-item-image {
@@ -240,6 +287,9 @@ body {
 }
 
 /* genre list */
+.top-genre-container {
+  /* padding-bottom: 70px; */
+}
 .genre-list {
   list-style-type: none;
   padding: 0;
@@ -254,10 +304,12 @@ body {
 .genre-item-index {
   width: 20px;
   text-align: right;
+  color: #f0f0f0;
 }
 
 .genre-item-info {
   margin-left: 10px;
+  color: #f0f0f0;
 }
 
 /* private user message */
@@ -266,6 +318,11 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  background-color: #2b2b2b;
+  border-radius: 8px;
+  margin-top: 2px;
+  margin-bottom: -55px;
+  padding: 90px 0 450px;
 }
 
 .private-user-container img {
@@ -281,4 +338,5 @@ body {
 .private-user-container p {
   font-size: 24px;
   font-weight: bold;
+  color: #f0f0f0;
 }

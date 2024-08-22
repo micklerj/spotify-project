@@ -6,6 +6,7 @@
   margin: 10px 0;
   font-size: 1.25rem; 
   font-weight: 500;
+  color: #f0f0f0;
 }
 
 .explore-users-container {
@@ -16,7 +17,7 @@
   max-width: 455px;
   min-width: 320px;
   overflow: hidden;
-  background-color: #fff;
+  background-color: #2b2b2b;
   padding: 1.25rem;  
 }
 
@@ -24,12 +25,22 @@
   display: flex;
   align-items: center;
   border: 1px solid #000;
+  background-color: #353535;
   border-radius: 50px;
   overflow: hidden;
   margin: auto;
   width: 90%;
   max-width: 510px;
   padding: 1px;
+}
+
+.search-bar-input {
+  background-color: #353535;
+  color: #f0f0f0;
+}
+
+.search-bar-input::placeholder {
+  color: #f0f0f0; 
 }
 
 .search-bar img {
@@ -112,13 +123,13 @@
   opacity: 0.5; 
 } 
 
-p a {
-  color: black;
+.exp-username-link {
+  color: #f0f0f0;
   text-decoration: none;
 }
 
-p a:hover {
-  color: dimgray;
+.exp-username-link:hover {
+  color: #c6c6c6;
 }
 
 .exp-confirmation {

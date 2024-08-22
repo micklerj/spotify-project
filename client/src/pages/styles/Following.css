@@ -6,7 +6,7 @@
   max-width: 455px;
   min-width: 320px;
   overflow: hidden;
-  background-color: #fff;
+  background-color: #2b2b2b;
   padding: 20px 25px;  
 }
 
@@ -17,6 +17,7 @@
   margin-bottom: .5rem;
   font-size: 1.25rem; 
   font-weight: 500;
+  color: #f0f0f0; 
 }
 
 .following-list {
@@ -55,7 +56,7 @@
 
 .following-follow-image-container img {
   width: 25px;
-  border-radius: 50%; /* makes the image a circle */
+  border-radius: 50%; 
   transition: opacity 0.2s ease-in-out; /* transition effect */
 }
 
@@ -63,13 +64,13 @@
   opacity: 0.5; /* makes the image darker on hover */
 } 
 
-p a {
-  color: black;
+.username-link {
+  color: #f0f0f0;
   text-decoration: none;
 }
 
-p a:hover {
-  color: dimgray;
+.username-link:hover {
+  color: #c6c6c6;
 }
 
 .fol-confirmation {

@@ -19,6 +19,7 @@ const generateRandomString = (length) => {
   .slice(0, length);
 }
 
+// dont know if i need this or not
 // Create an instance of axios with retry
 const axiosInstance = axios.create();
 axiosRetry(axiosInstance, {
