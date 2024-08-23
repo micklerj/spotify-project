@@ -20,6 +20,7 @@ function Explore() {
   const [displayList, setDisplayList] = useState([
     // {
     //   userID: '',
+    //   DBID: '',
     //   profilePic: '',
     //   userName: '',
     //   recentlyListenedTo: '',
@@ -114,6 +115,7 @@ function Explore() {
           .then(data => {
             return {
               userID: userID,
+              DBID: data.DBID,
               profilePic: data.profilePic,
               userName: data.username,
               recentlyListenedTo: data.recentlyPlayed,
@@ -331,6 +333,7 @@ function Explore() {
       {userIDList.length === 0 && inputSearched && (
         <div className='no-users-found'>
           No users found :(
+
         </div>
       )}
 
@@ -354,18 +357,17 @@ function Explore() {
                     <img src={user.profilePic} alt="profile pic" className="explore-item-image" />
                     <div className="explore-item-info">
                       <p>
-                        <Link to={`/profile/${user.userID}`} className="exp-username-link">
+                        <Link to={`/profile/${user.DBID}`} className="exp-username-link">
                           {user.userName}
                         </Link>
                       </p>
                       <DisplayRecentlyPlayed songTitle={user.recentlyListenedTo} />
                     </div>
                   </div>
-                  <div className="explore-follow-image-container">
+                  <div>
                     {user.userID !== userID && (user.privacy !== 'Private' || user.isFollowing) && (
-                      <img 
-                        src={user.isFollowing ? followingCheck : addFollowerIcon} 
-                        alt="Button image" 
+                      <button
+                        className={`exp-button ${user.isFollowing ? 'exp-unfollow-button' : 'exp-follow-button'}`}                    
                         onClick={() => {
                           if (user.privacy === 'Private' && user.isFollowing) {
                             setConfirmationUserID(user.userID);
@@ -374,7 +376,9 @@ function Explore() {
                             handleToggleFollow(user.userID, user.isFollowing);
                           }
                         }}
-                      />
+                      >
+                        {user.isFollowing ? 'Unfollow' : 'Follow'}
+                      </button>
                     )}
                   </div>
                 </li>

@@ -15,6 +15,7 @@ function Following() {
   const [followingList, setFollowingList] = useState([
     // {
     //   userID: '',
+    //   DBID: '',
     //   profilePic: '',
     //   userName: '',
     //   recentlyListenedTo: '',
@@ -67,6 +68,7 @@ function Following() {
               ...prevFollowingList,
               {
                 userID: userID,
+                DBID: data.DBID,
                 profilePic: data.profilePic,
                 userName: data.username,
                 recentlyListenedTo: data.recentlyPlayed,
@@ -214,28 +216,29 @@ function Following() {
                 <img src={user.profilePic} alt="profile pic" className="following-item-image" />
                 <div className="following-item-info">
                   <p>
-                    <Link to={`/profile/${user.userID}`} className="username-link">
+                    <Link to={`/profile/${user.DBID}`} className="username-link">
                       {user.userName}
                     </Link>
                   </p>
                   <DisplayRecentlyPlayed songTitle={user.recentlyListenedTo} />
                 </div>
               </div>
-              <div className="following-follow-image-container">
-              {user.userID !== userID && (user.privacy !== 'Private' || user.isFollowing) && (
-                <img 
-                  src={user.isFollowing ? followingCheck : addFollowerIcon} 
-                  alt="Button image" 
-                  onClick={() => {
-                    if (user.privacy === 'Private' && user.isFollowing) {
-                      setConfirmationUserID(user.userID);
-                      setShowConfirmation(true);              
-                    } else {
-                      handleToggleFollow(user.userID, user.isFollowing);
-                    }
-                  }}
-                />
-              )}
+              <div>
+                {user.userID !== userID && (user.privacy !== 'Private' || user.isFollowing) && (
+                  <button
+                    className={`fol-button ${user.isFollowing ? 'fol-unfollow-button' : 'fol-follow-button'}`}                    
+                    onClick={() => {
+                      if (user.privacy === 'Private' && user.isFollowing) {
+                        setConfirmationUserID(user.userID);
+                        setShowConfirmation(true);              
+                      } else {
+                        handleToggleFollow(user.userID, user.isFollowing);
+                      }
+                    }}
+                  >
+                    {user.isFollowing ? 'Unfollow' : 'Follow'}
+                  </button>
+                )}
               </div>
             </li>
           ))}

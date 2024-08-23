@@ -4,14 +4,14 @@ import ProfilePage from '../components/profilePage';
 import Footer from '../components/footerButtons';
 
 function Profile() {
-  const { userID } = useParams();
+  const { DBID } = useParams();
 
 
   return (    
     
     <div className="profile page">
 
-      <ProfilePage displayedUserID={userID} />   
+      <ProfilePage DBID={DBID} />   
 
       <Footer />   
       

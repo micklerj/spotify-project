@@ -23,6 +23,27 @@ getUser = async function(req, res) {
   }
 };
 
+convertDBIDToUserID = async function(req, res) {
+  var DBID = req.query.DBID || null;
+
+  if (DBID) {
+    try {
+      const foundUser = await user.findOne({ DBID: DBID });
+      if (!foundUser) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      return res.json(foundUser.userID);
+    }
+    catch (err){
+      console.log(err);
+    }    
+  } 
+  else {
+    return res.status(400).json({ message: 'No ID provided' });
+  }
+}
+
 // create a new user
 newUser = async function(req, res) {
   try {
@@ -31,13 +52,18 @@ newUser = async function(req, res) {
     // check if the user already exists
     const existingID = await user.findOne({ userID });
     if (!existingID) {
+      console.log("Creating new user: ", req.body);
       var newUser = new user(req.body);
       await newUser.save();
       res.status(201).json(newUser);
-    }    
+    }  
+    else {
+      res.status(201).json({ message: 'User already exists' });
+    }
   }
   catch (err){
     console.log(err);
+    res.status(500).json({ error: err.toString() });
   }
 }
 
@@ -224,4 +250,4 @@ logout = async function(req, res) {
   }
 }
 
-module.exports = { getUser, newUser, updateUser, changePrivacy, addToFollowing, removeFromFollowing, getAllUserIDs, searchUsers, getUserCount, logout };
+module.exports = { getUser, convertDBIDToUserID, newUser, updateUser, changePrivacy, addToFollowing, removeFromFollowing, getAllUserIDs, searchUsers, getUserCount, logout };

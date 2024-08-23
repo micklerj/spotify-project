@@ -87,7 +87,7 @@ callback = function(req, res) {
       json: true
     };
 
-    request.post(authOptions, function(error, response, body) {
+    request.post(authOptions, async function(error, response, body) {
       if (!error && response.statusCode === 200) { 
  
         req.session.accessToken = body.access_token,
@@ -96,41 +96,46 @@ callback = function(req, res) {
 
         // --------------------------------------------------------------------------
         // create new user if it doesn't exist
-        var options = {
-          url: 'https://api.spotify.com/v1/me',
-          headers: { 'Authorization': 'Bearer ' + req.session.accessToken },
-          json: true 
-        };
-      
-        request.get(options, async function(error, response, body) {
-          // if (body.images && body.images.length > 1) {
-            const postData = {
-              "username": body.display_name,
-              "profilePic": body.images[1] ? body.images[1].url : 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y',
-              "userID": body.id,
-              "privacy": "Public",
-              "recentlyPlayed": "",
-              "following": [],
-              "topArtists1M": [],
-              "topArtists6M": [],
-              "topArtists1Y": [],
-              "topSongs1M": [],
-              "topSongs6M": [],
-              "topSongs1Y": [],
-              "topGenres1M": [],
-              "topGenres6M": [],
-              "topGenres1Y": []
-            }
+        try {
+          const options = {
+            url: 'https://api.spotify.com/v1/me',
+            headers: { 'Authorization': 'Bearer ' + req.session.accessToken },
+          };
+        
+          const response = await axios.get(options.url, { headers: options.headers });
+          const body = response.data;
+        
+          const userCountResponse = await axios.get('http://localhost:3500/api/getUserCount');
+          const userCount = userCountResponse.data.count;
+        
+          const postData = {
+            "username": body.display_name,
+            "profilePic": body.images[1] ? body.images[1].url : 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y',
+            "userID": body.id,
+            "DBID": userCount + 1,    // my custom ID for privacy sake
+            "privacy": "Public",
+            "recentlyPlayed": "",
+            "following": [],
+            "topArtists1M": [],
+            "topArtists6M": [],
+            "topArtists1Y": [],
+            "topSongs1M": [],
+            "topSongs6M": [],
+            "topSongs1Y": [],
+            "topGenres1M": [],
+            "topGenres6M": [],
+            "topGenres1Y": []
+          }
+        
+          await axios.post('http://localhost:3500/api/newUser', postData);
+        
+          res.redirect('http://localhost:3000/profile');
+        } catch (error) {
+          console.error('Error:', error);
+          res.status(500).send('An error occurred');
+        }
+        // --------------------------------------------------------------------------
 
-            await axios.post('http://localhost:3500/api/newUser', postData)
-              .catch((error) => { 
-                console.error('Error:', error);
-              })
-          // }
-          // --------------------------------------------------------------------------
-        });
-
-        res.redirect('http://localhost:3000/profile');
       } else {
         res.redirect('http://localhost:3000?' +
           querystring.stringify({
@@ -550,8 +555,7 @@ unfollow = function(req, res) {
     });
 }
 
-// get recently played songs
-// note: this spotify endpoint isn't always the most accurate
+// get recently played songs           note: this spotify endpoint isn't always the most accurate
 getRecentlyPlayed = function(req, res) {
   var options = {
     url: 'https://api.spotify.com/v1/me/player/recently-played?' +
@@ -578,4 +582,28 @@ getRecentlyPlayed = function(req, res) {
     });
 }
 
-module.exports = { login, callback, topArtists, topSongs, topGenres, profileInfo, test, ensureAuth, followCheck, follow, unfollow, getRecentlyPlayed };
+getFollowerCount = function(req, res) {
+  const id = req.query.id;
+
+  var options = {
+    url: `https://api.spotify.com/v1/users/${id}`,
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + req.session.accessToken 
+    }
+  };
+
+  axios.get(options.url, { headers: options.headers })
+    .then(function(response) {
+      res.json(response.data.followers.total);
+    })
+    .catch(function(error) {
+      console.error('Error:', error);
+      if (error.response) {
+        res.status(error.response.status).json({ error: 'Failed to fetch follower count' });
+      } else {
+        res.status(500).json({ error: 'Failed to fetch follower count' });
+      }
+    });
+}
+module.exports = { login, callback, topArtists, topSongs, topGenres, profileInfo, test, ensureAuth, followCheck, follow, unfollow, getRecentlyPlayed, getFollowerCount };

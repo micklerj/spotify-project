@@ -5,11 +5,11 @@ const databaseController = require('../controllers/databaseController');
 
 router.get('/getUser', databaseController.getUser);
 
+router.get('/convertDBIDToUserID', databaseController.convertDBIDToUserID);
+
 router.post('/newUser', databaseController.newUser);
 
 router.put('/updateUser', databaseController.updateUser);
-
-// router.put('/updateGenres', databaseController.updateGenres);
 
 router.put('/addToFollowing', databaseController.addToFollowing);
 

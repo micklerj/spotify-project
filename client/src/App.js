@@ -17,7 +17,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/"index element={<Login />} />
-          <Route path="/profile/:userID?" element={
+          <Route path="/profile/:DBID?" element={
             <ProtectedRoute>
               <Profile />
             </ProtectedRoute>

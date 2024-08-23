@@ -115,21 +115,40 @@
 
 .explore-item-info p {
   margin: 0;
-  max-width: 235px;
+  max-width: 215px;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: #f0f0f0;
 }
 
-
-.explore-follow-image-container img {
-  width: 25px;
-  border-radius: 50%; /* makes the image a circle */
-  transition: opacity 0.2s ease-in-out; /* transition effect */
+.exp-button {
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 50px; 
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-.explore-follow-image-container:hover img {
-  opacity: 0.5; 
-} 
+.exp-follow-button {
+  background-color: #229822;
+  color: #2b2b2b;
+  padding: 4px 13.2px;
+}
+.exp-unfollow-button {
+  background-color: #2b2b2b;
+  border: 1px solid #229822;
+  color: #229822;
+  padding: 4px 8px;
+}
+
+.exp-follow-button:hover {
+  background-color: #1b771b;
+}
+
+.exp-unfollow-button:hover {
+  background-color: #202020;
+}
 
 .exp-username-link {
   color: #f0f0f0;

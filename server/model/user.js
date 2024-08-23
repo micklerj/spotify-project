@@ -14,6 +14,10 @@ const userSchema = new Schema({
     type: String,
     required: true
   },
+  DBID: {
+    type: String,
+    required: true
+  },
   privacy: {
     type: String,
     required: true

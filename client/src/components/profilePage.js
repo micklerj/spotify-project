@@ -9,7 +9,7 @@ import './styles/profilePage.css';
 import DisplayRecentlyPlayed from '../components/recentlyPlayed';
 
 
-function ProfilePage({displayedUserID}) {
+function ProfilePage({DBID}) {
   const [artists, setArtists] = useState([]);
   const [artistURLs, setArtistURLs] = useState([]);
   const [artistPics, setArtistPics] = useState([]);
@@ -27,8 +27,10 @@ function ProfilePage({displayedUserID}) {
   const [genreCount, setGenreCount] = useState(10);
   const [profilePic, setProfilePic] = useState('');
   const [userName, setUserName] = useState('');
+  const [followerCount, setFollowerCount] = useState(null);
   const [userID, setUserID] = useState('');
   const [userIDDupe, setUserIDDupe] = useState('');     // for when the current userID is needed but another user is displayed
+  const [displayedUserID, setDisplayedUserID] = useState(null);
   const [privacy, setPrivacy] = useState(null);
   const [recentlyPlayed, setRecentlyPlayed] = useState([]);
   const [otherUserIsDisplayed, setOtherUserIsDisplayed] = useState(null);
@@ -38,20 +40,45 @@ function ProfilePage({displayedUserID}) {
 
   const navigate = useNavigate();
 
+
+  // convert DBID to displayedUserID
+  useEffect(() => {
+    if (DBID) {
+      console.log('DBID: ',DBID);
+      fetch(`/api/convertDBIDToUserID?DBID=${DBID}`)
+        .then(response => response.json())
+        .then(data => {
+          console.log('userID: ',data);
+          setDisplayedUserID(data);
+        })
+        .catch((error) => { 
+          console.error('Error:', error); 
+        });
+    }
+    else {
+      setDisplayedUserID('');
+      console.log('no DBID');
+    }
+  }, []);
+
   // get profile pic, username, and userID    and   update DB if neccisary 
   useEffect(() => {
+    if (displayedUserID === null) return;
+    console.log('test')
+
     const fetchData = async () => {
       try {
         const response = await fetch('/api/profileInfo');
         const data = await response.json();    
   
-        if (data.id && (displayedUserID === undefined || displayedUserID === data.id)) {  
+        if (data.id && (!displayedUserID || displayedUserID === data.id)) {  
           setOtherUserIsDisplayed(false);
           setWasOriginallyFollowed(false);  // doesn't matter, but need this line in order for loading to finish
           setUserID(data.id); 
           console.log('current user ID: ', data.id);
           setProfilePic(data.images[1].url);
           setUserName(data.display_name);
+          setFollowerCount(data.followers.total);
           console.log(data);
   
           // update profile info in DB if necessary
@@ -59,6 +86,7 @@ function ProfilePage({displayedUserID}) {
             "userID": data.id,
             "username": data.display_name,
             "profilePic": data.images[1].url,
+            "followerCount": data.followers.total
           }  
           try {
             await axios.put('http://localhost:3500/api/updateUser', putData);
@@ -78,14 +106,24 @@ function ProfilePage({displayedUserID}) {
             }
             else {
               setUserIDDupe(data.id);
-            }
-            setProfilePic(otherUserData.profilePic);
-            setUserName(otherUserData.username);
-            setRecentlyPlayed(otherUserData.recentlyPlayed);
-            setPrivacy(otherUserData.privacy);            
+              setProfilePic(otherUserData.profilePic);
+              setUserName(otherUserData.username);
+              setRecentlyPlayed(otherUserData.recentlyPlayed);
+              setPrivacy(otherUserData.privacy); 
+            }                       
           } catch (error) {
             console.error('Error:', error);
           }
+
+          // get follower count of other user
+          axios.get(`/api/getFollowerCount?id=${displayedUserID}`)
+            .then(response => {
+              const data = response.data;
+              setFollowerCount(data);
+            })
+            .catch((error) => { 
+              console.error('Error:', error); 
+            });
 
           // determine if other user is followed or not
           try {
@@ -109,7 +147,7 @@ function ProfilePage({displayedUserID}) {
     }
   
     fetchData();
-  }, []);
+  }, [displayedUserID]);
 
   // get privacy setting  (of currently logged in user)
   useEffect(() => {    
@@ -429,26 +467,35 @@ function ProfilePage({displayedUserID}) {
               <div className="song">
                 <DisplayRecentlyPlayed songTitle={recentlyPlayed} />
               </div>
+              <div className='privacy-n-followers'>
+                {(privacy === 'Public' || privacy === 'Private') && (
+                  <img 
+                    src={privacy === 'Public' ? publicIcon : privateIcon} 
+                    className='privacy-icon'
+                    onClick={otherUserIsDisplayed ? null : handleChangePrivacy}
+                    title={otherUserIsDisplayed ? "" :"Change privacy"}
+                  />
+                )}
+                <div className='follower-count'>{`${followerCount} followers`}</div>
+              </div>
             </div>
           </div>
-          <div className="image-container">
-            {(privacy === 'Public' || privacy === 'Private') && !otherUserIsDisplayed && (
-              <img 
-                src={privacy === 'Public' ? publicIcon : privateIcon} 
-                alt="privacy image" 
-                onClick={handleChangePrivacy}
-                title="Change privacy"
-              />
-            )}
-            { otherUserIsDisplayed && (privacy === 'Public' || wasOriginallyFollowed) && (otherUserIsFollowed !== null) && (
-              <img 
-                src={otherUserIsFollowed ? followingCheck : addFollowerIcon} 
-                alt="(un)follow image" 
-                onClick={handleToggleFollow}
-                title={otherUserIsFollowed ? 'unfollow' : 'follow'}
-              />
-            )}
-          </div>
+          { otherUserIsDisplayed && (privacy === 'Public' || wasOriginallyFollowed) && (otherUserIsFollowed !== null) && (             
+            <button
+              className={`pro-button ${otherUserIsFollowed ? 'pro-unfollow-button' : 'pro-follow-button'}`}                    
+              onClick={() => {
+                if (privacy === 'Private' && otherUserIsFollowed) {
+                  // setConfirmationUserID(user.userID);
+                  // setShowConfirmation(true);   
+                  handleToggleFollow();           
+                } else {
+                  handleToggleFollow();
+                }
+              }}
+            >
+              {otherUserIsFollowed ? 'Unfollow' : 'Follow'}
+            </button>
+          )}
 
           <div className="logout-button-container">
             {userID && (   
@@ -578,7 +625,7 @@ function ProfilePage({displayedUserID}) {
               </div>
             </div>
 
-            <div className="top-items-container top-genre-container">
+            <div className="top-items-container">
               <div className="items-header">
                 Top Genres
                 <div className="buttons-container">
