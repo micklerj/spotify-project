@@ -303,121 +303,125 @@ function Explore() {
   }
 
   return (
-    <div className="explore page">
-      <div className='explore-title'>
-        Explore
-      </div>
-
-      <div className="search-bar">
-        <img src={magnifyingGlass} alt="Search" />
-        <input
-          type="text"
-          value={searchInput}
-          className='search-bar-input'
-          onChange={e => {
-            setSearchInput(e.target.value);
-            setInputHandled(false);
-          }}
-          onKeyDown={e => {
-            if (e.key === 'Enter') {
-              handleInput(); 
-            }
-          }}
-          placeholder="Search"
-        />
-        <button onClick={inputHandled ? handleClearInput : handleInput} className="search-bar-button">
-          <img src={inputHandled ? x : submit} alt="Submit" />
-        </button>
-      </div>
-
-      {userIDList.length === 0 && inputSearched && (
-        <div className='no-users-found'>
-          No users found :(
-
+    <>
+      <div className="color-border">
+        <div className='explore-title'>
+          Explore
         </div>
-      )}
 
-      <div >
-        <InfiniteScroll
-          dataLength={displayList.length}
-          next={() => {
-            if (DBindex < userCount && loadFromDB) {
-              getDisplayUsers(DBindex);
-            }
-          }}
-          hasMore={true}
-          loader={<h4>Loading...</h4>}
-          scrollThreshold={0.5}
-        >
-          <div className='explore-users-container'>
-            <ol className="explore-list">
-              {displayList.map((user, index) => (
-                <li key={index} className="explore-item">
-                  <div className="explore-item-content">
-                    <img src={user.profilePic} alt="profile pic" className="explore-item-image" />
-                    <div className="explore-item-info">
-                      <p>
-                        <Link to={`/profile/${user.DBID}`} className="exp-username-link">
-                          {user.userName}
-                        </Link>
-                      </p>
-                      <DisplayRecentlyPlayed songTitle={user.recentlyListenedTo} />
+        <div className='search-bar-container'>
+          <div className="search-bar">
+            <img src={magnifyingGlass} alt="Search" />
+            <input
+              type="text"
+              value={searchInput}
+              className='search-bar-input'
+              onChange={e => {
+                setSearchInput(e.target.value);
+                setInputHandled(false);
+              }}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  handleInput(); 
+                }
+              }}
+              placeholder="Search"
+            />
+            <button onClick={inputHandled ? handleClearInput : handleInput} className="search-bar-button">
+              <img src={inputHandled ? x : submit} alt="Submit" />
+            </button>
+          </div>
+        </div>
+
+        {userIDList.length === 0 && inputSearched && (
+          <div className='no-users-found'>
+            No users found :(
+
+          </div>
+        )}
+
+        <div className='infinite-scroll-container'>
+          <InfiniteScroll
+            dataLength={displayList.length}
+            next={() => {
+              if (DBindex < userCount && loadFromDB) {
+                getDisplayUsers(DBindex);
+              }
+            }}
+            hasMore={true}
+            scrollThreshold={0.5}
+          >
+            <div className='explore-users-container'>
+              <ol className="explore-list">
+                {displayList.map((user, index) => (
+                  <li key={index} className="explore-item">
+                    <div className="explore-item-content">
+                      <img src={user.profilePic} alt="profile pic" className="explore-item-image" />
+                      <div className="explore-item-info">
+                        <p>
+                          <Link to={`/profile/${user.DBID}`} className="exp-username-link">
+                            {user.userName}
+                          </Link>
+                        </p>
+                        <DisplayRecentlyPlayed songTitle={user.recentlyListenedTo} />
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    {user.userID !== userID && (user.privacy !== 'Private' || user.isFollowing) && (
-                      <button
-                        className={`exp-button ${user.isFollowing ? 'exp-unfollow-button' : 'exp-follow-button'}`}                    
-                        onClick={() => {
-                          if (user.privacy === 'Private' && user.isFollowing) {
-                            setConfirmationUserID(user.userID);
-                            setShowConfirmation(true);              
-                          } else {
-                            handleToggleFollow(user.userID, user.isFollowing);
-                          }
-                        }}
-                      >
-                        {user.isFollowing ? 'Unfollow' : 'Follow'}
-                      </button>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
-          {<div style={{ height: '100vh' }} />} {/* Placeholder */}
-        </InfiniteScroll>
-      </div>
-
-      {showConfirmation && (
-        <>
-          <div className="exp-overlay" onClick={() => setShowConfirmation(false)}></div>
-
-          <div className="exp-confirmation">
-            <p>Are you sure you want to unfollow? This user is private and can't be re-followed.</p>
-            <div className="exp-confirm-buttons">
-              <button 
-                className="exp-confirm-button"
-                onClick={() => {
-                  handleToggleFollow(confirmationUserID, true);
-                  setShowConfirmation(false);
-                }}>
-                Yes
-              </button>
-              <button 
-                className="exp-confirm-button"
-                onClick={() => setShowConfirmation(false)}>
-                No
-              </button>
+                    <div>
+                      {user.userID !== userID && (user.privacy !== 'Private' || user.isFollowing) && (
+                        <button
+                          className={`exp-button ${user.isFollowing ? 'exp-unfollow-button' : 'exp-follow-button'}`}                    
+                          onClick={() => {
+                            if (user.privacy === 'Private' && user.isFollowing) {
+                              setConfirmationUserID(user.userID);
+                              setShowConfirmation(true);              
+                            } else {
+                              handleToggleFollow(user.userID, user.isFollowing);
+                            }
+                          }}
+                        >
+                          {user.isFollowing ? 'Unfollow' : 'Follow'}
+                        </button>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ol>
             </div>
-          </div>
-        </>
-      )}
+            {<div style={{ height: '100vh' }} />} {/* Placeholder */}
+          </InfiniteScroll>
+        </div>
 
-      <Footer />
+        {showConfirmation && (
+          <>
+            <div className="exp-overlay" onClick={() => setShowConfirmation(false)}></div>
 
-    </div>    
+            <div className="exp-confirmation">
+              <p>Are you sure you want to unfollow? This user is private and can't be re-followed.</p>
+              <div className="exp-confirm-buttons">
+                <button 
+                  className="exp-confirm-button"
+                  onClick={() => {
+                    handleToggleFollow(confirmationUserID, true);
+                    setShowConfirmation(false);
+                  }}>
+                  Yes
+                </button>
+                <button 
+                  className="exp-confirm-button"
+                  onClick={() => setShowConfirmation(false)}>
+                  No
+                </button>
+              </div>
+            </div>
+          </>
+        )}
 
+        
+
+      </div>   
+      
+      <Footer /> 
+    </>
 
   );
 }

@@ -168,7 +168,7 @@ topArtists = function(req, res) {
   axios.get(options.url, { headers: options.headers })
     .then(async function(response) {
       var body = response.data;
-      console.log(body);
+      // console.log(body);
       // update database if init is true (first rendering of the user's profile)
       if (init) {
         // get user ID

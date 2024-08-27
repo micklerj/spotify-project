@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import privateIcon from '../assets/private.png';
 import publicIcon from '../assets/public.png';
-import followingCheck from '../assets/followingCheck.png';
-import addFollowerIcon from '../assets/addFollowerIcon.png';
 import './styles/profilePage.css';
 import DisplayRecentlyPlayed from '../components/recentlyPlayed';
 
@@ -37,6 +35,9 @@ function ProfilePage({DBID}) {
   const [otherUserIsFollowed, setOtherUserIsFollowed] = useState(null);
   const [wasOriginallyFollowed, setWasOriginallyFollowed] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isJoseph, setIsJoseph] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [showPrivacyConfirmation, setShowPrivacyConfirmation] = useState(false);
 
   const navigate = useNavigate();
 
@@ -48,7 +49,7 @@ function ProfilePage({DBID}) {
       fetch(`/api/convertDBIDToUserID?DBID=${DBID}`)
         .then(response => response.json())
         .then(data => {
-          console.log('userID: ',data);
+          console.log('userID : ',data);
           setDisplayedUserID(data);
         })
         .catch((error) => { 
@@ -80,6 +81,11 @@ function ProfilePage({DBID}) {
           setUserName(data.display_name);
           setFollowerCount(data.followers.total);
           console.log(data);
+
+          // for personalized message
+          if (data.id === '22o22cwit6gnvviwcfsc6l5pi') {   
+            setIsJoseph(true);
+          } 
   
           // update profile info in DB if necessary
           const putData = {
@@ -110,6 +116,12 @@ function ProfilePage({DBID}) {
               setUserName(otherUserData.username);
               setRecentlyPlayed(otherUserData.recentlyPlayed);
               setPrivacy(otherUserData.privacy); 
+
+              // for personalized message
+              if (data === '22o22cwit6gnvviwcfsc6l5pi') {   
+                setIsJoseph(true);
+              }
+
             }                       
           } catch (error) {
             console.error('Error:', error);
@@ -286,7 +298,7 @@ function ProfilePage({DBID}) {
         .then(response => response.json())
         .then(data => {
           if (loadOnPage) {
-            // console.log(data);
+            console.log('song data: ',data);
             setSongs(data.items.map(item => item.name));
             setSongPics(data.items.map(item => item.album.images[0].url));
             setSongSingers(data.items.map(item => item.artists[0].name));
@@ -472,29 +484,41 @@ function ProfilePage({DBID}) {
                   <img 
                     src={privacy === 'Public' ? publicIcon : privateIcon} 
                     className='privacy-icon'
-                    onClick={otherUserIsDisplayed ? null : handleChangePrivacy}
+                    onClick={otherUserIsDisplayed ? null : () => setShowPrivacyConfirmation(true)}
                     title={otherUserIsDisplayed ? "" :"Change privacy"}
                   />
                 )}
-                <div className='follower-count'>{`${followerCount} followers`}</div>
+                <div className='follower-count'>
+                  {followerCount}
+                  <span className='follower-count-text'>{'followers'}</span>
+                </div>
               </div>
+              { otherUserIsDisplayed && (privacy === 'Public' || wasOriginallyFollowed) && (otherUserIsFollowed !== null) && (             
+                <button
+                  className={`pro-button ${otherUserIsFollowed ? 'pro-unfollow-button' : 'pro-follow-button'}`}                    
+                  onClick={() => {
+                    if (privacy === 'Private' && otherUserIsFollowed) {
+                      setShowConfirmation(true);   
+                    } else {
+                      handleToggleFollow();
+                    }
+                  }}
+                >
+                  {otherUserIsFollowed ? 'Unfollow' : 'Follow'}
+                </button>
+              )}
+              { userID && (
+                <div className='pro-info-placeholder'></div>
+              )}
             </div>
-          </div>
-          { otherUserIsDisplayed && (privacy === 'Public' || wasOriginallyFollowed) && (otherUserIsFollowed !== null) && (             
-            <button
-              className={`pro-button ${otherUserIsFollowed ? 'pro-unfollow-button' : 'pro-follow-button'}`}                    
-              onClick={() => {
-                if (privacy === 'Private' && otherUserIsFollowed) {
-                  // setConfirmationUserID(user.userID);
-                  // setShowConfirmation(true);   
-                  handleToggleFollow();           
-                } else {
-                  handleToggleFollow();
-                }
-              }}
-            >
-              {otherUserIsFollowed ? 'Unfollow' : 'Follow'}
-            </button>
+            
+          </div>   
+          {isJoseph && (
+            <div className='personalized-message-container'>
+            Thanks for checking out my app! If you find it cool, or at least don't think it sucks, 
+            please tell all your friends and family to check it out too. 
+            I'm thankful for all of you and greatly appriciate the support! God bless.
+            </div>  
           )}
 
           <div className="logout-button-container">
@@ -503,6 +527,56 @@ function ProfilePage({DBID}) {
             )}
           </div>
         </div>
+      )}
+
+      {showConfirmation && (
+        <>
+          <div className="pro-overlay" onClick={() => setShowConfirmation(false)}></div>
+
+          <div className="pro-confirmation">
+            <p>Are you sure you want to unfollow? This user is private and can't be re-followed.</p>
+            <div className='pro-confirm-buttons'>
+              <button 
+                className="pro-confirm-button"
+                onClick={() => {
+                  handleToggleFollow();
+                  setShowConfirmation(false);
+                }}>
+                Yes
+              </button>
+              <button 
+                className="pro-confirm-button"
+                onClick={() => setShowConfirmation(false)}>
+                No
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {showPrivacyConfirmation && (
+        <>
+          <div className="pro-overlay" onClick={() => setShowPrivacyConfirmation(false)}></div>
+
+          <div className="pro-confirmation">
+            <p>change privacy?</p>
+            <div className='pro-confirm-buttons'>
+              <button 
+                className="pro-confirm-button"
+                onClick={() => {
+                  handleChangePrivacy();
+                  setShowPrivacyConfirmation(false);
+                }}>
+                Yes
+              </button>
+              <button 
+                className="pro-confirm-button"
+                onClick={() => setShowPrivacyConfirmation(false)}>
+                No
+              </button>
+            </div>
+          </div>
+        </>
       )}
       
       {loading ? (

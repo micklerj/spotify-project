@@ -3,24 +3,23 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 10px 0;
+  padding: 10px 0;
   font-size: 1.25rem; 
   font-weight: 500;
   color: #f0f0f0;
-}
-
-.explore-users-container {
-  box-sizing: border-box; 
-  justify-content: center;
-  margin: 0 auto;
-  width: 100%; 
-  max-width: 455px;
-  min-width: 320px;
-  overflow: hidden;
   background-color: #2b2b2b;
-  padding: 1.25rem;  
+  width: 99%;
+  margin: 0 auto;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
 }
 
+.search-bar-container {
+  background-color: #2b2b2b;
+  width: 99%;
+  margin: -1px auto;
+  padding: 1px 0;
+}
 .search-bar {
   display: flex;
   align-items: center;
@@ -37,6 +36,10 @@
 .search-bar-input {
   background-color: #353535;
   color: #f0f0f0;
+  caret-color: auto;
+  flex: 1;
+  border: none;
+  outline: none;
 }
 
 .search-bar-input::placeholder {
@@ -49,15 +52,9 @@
   width: 15px;
 }
 
-.search-bar input {
-  flex: 1;
-  border: none;
-  outline: none;
-}
-
-.search-bar button {
+.search-bar-button {
   border: 0;
-  background-color: white;
+  background-color: #353535;
   border-radius: 50%;
   width: 25px;  
   height: 25px;
@@ -84,6 +81,28 @@
   height: 80px;
   font-weight: 350;
   color: #f0f0f0;
+  background-color: #2b2b2b;
+  width: 99%;
+  margin: 0 auto;
+}
+
+.infinite-scroll-container {
+  background-color: #2b2b2b;
+  width: 99%;
+  margin: 0 auto;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.explore-users-container {
+  box-sizing: border-box; 
+  justify-content: center;
+  margin: 0 auto;
+  width: 100%; 
+  max-width: 455px;
+  min-width: 320px;
+  overflow: hidden;
+  padding: 1.25rem;  
 }
 
 .explore-list {
@@ -132,6 +151,7 @@
 
 .exp-follow-button {
   background-color: #229822;
+  border: 1px solid #229822;
   color: #2b2b2b;
   padding: 4px 13.2px;
 }

@@ -203,76 +203,79 @@ function Following() {
 
   //TODO: implement search and infinite scroll
   return (
-    <div className="following-page">
+    <>
+      <div className='color-border'>
 
-      <div className='followed-users-container'>
-        <div className='list-title'>
-          Following
-        </div>
-        <ol className="following-list">
-          {followingList.map((user, index) => (
-            <li key={index} className="following-item">
-              <div className="following-item-content">
-                <img src={user.profilePic} alt="profile pic" className="following-item-image" />
-                <div className="following-item-info">
-                  <p>
-                    <Link to={`/profile/${user.DBID}`} className="username-link">
-                      {user.userName}
-                    </Link>
-                  </p>
-                  <DisplayRecentlyPlayed songTitle={user.recentlyListenedTo} />
-                </div>
-              </div>
-              <div>
-                {user.userID !== userID && (user.privacy !== 'Private' || user.isFollowing) && (
-                  <button
-                    className={`fol-button ${user.isFollowing ? 'fol-unfollow-button' : 'fol-follow-button'}`}                    
-                    onClick={() => {
-                      if (user.privacy === 'Private' && user.isFollowing) {
-                        setConfirmationUserID(user.userID);
-                        setShowConfirmation(true);              
-                      } else {
-                        handleToggleFollow(user.userID, user.isFollowing);
-                      }
-                    }}
-                  >
-                    {user.isFollowing ? 'Unfollow' : 'Follow'}
-                  </button>
-                )}
-              </div>
-            </li>
-          ))}
-        </ol>
-      </div>
-
-      {showConfirmation && (
-        <>
-          <div className="fol-overlay" onClick={() => setShowConfirmation(false)}></div>
-
-          <div className="fol-confirmation">
-            <p>Are you sure you want to unfollow? This user is private and can't be re-followed.</p>
-            <div className='fol-confirm-buttons'>
-              <button 
-                className="fol-confirm-button"
-                onClick={() => {
-                  handleToggleFollow(confirmationUserID, true);
-                  setShowConfirmation(false);
-                }}>
-                Yes
-              </button>
-              <button 
-                className="fol-confirm-button"
-                onClick={() => setShowConfirmation(false)}>
-                No
-              </button>
-            </div>
+        <div className='followed-users-container'>
+          <div className='list-title'>
+            Following
           </div>
-        </>
-      )}
+          <ol className="following-list">
+            {followingList.map((user, index) => (
+              <li key={index} className="following-item">
+                <div className="following-item-content">
+                  <img src={user.profilePic} alt="profile pic" className="following-item-image" />
+                  <div className="following-item-info">
+                    <p>
+                      <Link to={`/profile/${user.DBID}`} className="username-link">
+                        {user.userName}
+                      </Link>
+                    </p>
+                    <DisplayRecentlyPlayed songTitle={user.recentlyListenedTo} />
+                  </div>
+                </div>
+                <div>
+                  {user.userID !== userID && (user.privacy !== 'Private' || user.isFollowing) && (
+                    <button
+                      className={`fol-button ${user.isFollowing ? 'fol-unfollow-button' : 'fol-follow-button'}`}                    
+                      onClick={() => {
+                        if (user.privacy === 'Private' && user.isFollowing) {
+                          setConfirmationUserID(user.userID);
+                          setShowConfirmation(true);              
+                        } else {
+                          handleToggleFollow(user.userID, user.isFollowing);
+                        }
+                      }}
+                    >
+                      {user.isFollowing ? 'Unfollow' : 'Follow'}
+                    </button>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
 
+        {showConfirmation && (
+          <>
+            <div className="fol-overlay" onClick={() => setShowConfirmation(false)}></div>
+
+            <div className="fol-confirmation">
+              <p>Are you sure you want to unfollow? This user is private and can't be re-followed.</p>
+              <div className='fol-confirm-buttons'>
+                <button 
+                  className="fol-confirm-button"
+                  onClick={() => {
+                    handleToggleFollow(confirmationUserID, true);
+                    setShowConfirmation(false);
+                  }}>
+                  Yes
+                </button>
+                <button 
+                  className="fol-confirm-button"
+                  onClick={() => setShowConfirmation(false)}>
+                  No
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+
+        
+      </div>  
+      
       <Footer />
-    </div>  
-
+    </>
   );
 }
 
