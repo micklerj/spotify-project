@@ -8,8 +8,8 @@ const qs = require('qs');
 
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
-const REDIRECT_URI = 'http://localhost:3500/api/callback'
-// const REDIRECT_URI = 'https://spotify-project-lhca.onrender.com/api/callback'
+// const REDIRECT_URI = 'http://localhost:3500/api/callback'
+const REDIRECT_URI = 'https://spotify-project-lhca.onrender.com/api/callback'
 
 var stateKey = 'spotify_auth_state';
 
