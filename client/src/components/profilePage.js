@@ -89,7 +89,7 @@ function ProfilePage({DBID}) {
             "followerCount": data.followers.total
           }  
           try {
-            await axios.put('http://localhost:3500/api/updateUser', putData);
+            await axios.put('https://spotify-project-lhca.onrender.com/api/updateUser', putData);
           } catch (error) { 
             console.error('Error:', error);
           }
@@ -182,7 +182,7 @@ function ProfilePage({DBID}) {
             "userID": userID,
             "recentlyPlayed": songNArtist
           }  
-          axios.put('http://localhost:3500/api/updateUser', putData)
+          axios.put('https://spotify-project-lhca.onrender.com/api/updateUser', putData)
             .catch((error) => { 
               console.error('Error:', error);
             })
