@@ -186,20 +186,20 @@ function Following() {
     }
 
     // toggle follow with spotify api
-    // if (wasFollowing) {
-    //   // unfollow
-    //   fetch(`/api/unfollow?id=${otherUserID}`)
-    //     .catch((error) => { 
-    //       console.error('Error:', error); 
-    //     });
-    // }
-    // else {
-    //   // follow
-    //   fetch(`/api/follow?id=${otherUserID}`)
-    //     .catch((error) => { 
-    //       console.error('Error:', error);
-    //     });
-    // }
+    if (wasFollowing) {
+      // unfollow
+      fetch(`/api/unfollow?id=${otherUserID}`)
+        .catch((error) => { 
+          console.error('Error:', error); 
+        });
+    }
+    else {
+      // follow
+      fetch(`/api/follow?id=${otherUserID}`)
+        .catch((error) => { 
+          console.error('Error:', error);
+        });
+    }
   }
 
   //TODO: implement search and infinite scroll

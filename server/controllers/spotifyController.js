@@ -457,7 +457,6 @@ async function refreshAccessToken(req) {
 
 // check if current user is following other user(s)
 followCheck = function(req, res) {
-  // TODO: this sometimes and works and sometimes does not. no clue why
   const ids = req.query.ids;
   var options = {
     url: 'https://api.spotify.com/v1/me/following/contains?' +
@@ -570,6 +569,7 @@ getRecentlyPlayed = function(req, res) {
     });
 }
 
+// gets number of followers            note: spotify api doesn't allow getting the actuall followers themselves
 getFollowerCount = function(req, res) {
   const id = req.query.id;
 
@@ -594,4 +594,6 @@ getFollowerCount = function(req, res) {
       }
     });
 }
+
+
 module.exports = { login, callback, topArtists, topSongs, topGenres, profileInfo, ensureAuth, followCheck, follow, unfollow, getRecentlyPlayed, getFollowerCount };

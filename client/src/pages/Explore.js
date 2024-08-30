@@ -193,8 +193,8 @@ function Explore() {
 
   
 
-   // toggle follow status of a user
-   async function handleToggleFollow(otherUserID, wasFollowing) {
+  // toggle follow status of a user
+  async function handleToggleFollow(otherUserID, wasFollowing) {
     // toggle isFollowing in displayList   (for follow button image)
     setDisplayList(displayList.map(user => 
       user.userID === otherUserID 
@@ -227,20 +227,20 @@ function Explore() {
     }
 
     // toggle follow with spotify api
-    // if (wasFollowing) {
-    //   // unfollow
-    //   fetch(`/api/unfollow?id=${otherUserID}`)
-    //     .catch((error) => { 
-    //       console.error('Error:', error); 
-    //     });
-    // }
-    // else {
-    //   // follow
-    //   fetch(`/api/follow?id=${otherUserID}`)
-    //     .catch((error) => { 
-    //       console.error('Error:', error);
-    //     });
-    // }
+    if (wasFollowing) {
+      // unfollow
+      fetch(`/api/unfollow?id=${otherUserID}`)
+        .catch((error) => { 
+          console.error('Error:', error); 
+        });
+    }
+    else {
+      // follow
+      fetch(`/api/follow?id=${otherUserID}`)
+        .catch((error) => { 
+          console.error('Error:', error);
+        });
+    }
 
     // update followedUserIDList
     if (wasFollowing) {
