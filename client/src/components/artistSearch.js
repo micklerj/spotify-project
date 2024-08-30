@@ -28,7 +28,6 @@ function ArtistSearch() {
 
   // search function
   async function searchArtist() {
-    console.log('searching  for ' + artist);
 
     // get request retrieving the artist ID
     var searchParams = {
@@ -41,7 +40,6 @@ function ArtistSearch() {
     var artistID = await fetch('https://api.spotify.com/v1/search?q=' + artist + '&type=artist', searchParams)
       .then(response => response.json())
       .then(data => { 
-        console.log(data);
         return data.artists.items[0].id; 
       })
 
@@ -49,7 +47,6 @@ function ArtistSearch() {
     var returnedAlbums = await fetch('https://api.spotify.com/v1/artists/' + artistID + '/albums' + '?include_groups=album&market=US&limit=50', searchParams)
       .then(response => response.json())
       .then(data => {
-        console.log(data);
         setAlbums(data.items);
       }
     )

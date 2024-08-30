@@ -1,8 +1,6 @@
 import React, {useState, useEffect, useRef} from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import followingCheck from '../assets/followingCheck.png';
-import addFollowerIcon from '../assets/addFollowerIcon.png';
 import './styles/Following.css';
 import DisplayRecentlyPlayed from '../components/recentlyPlayed';
 import Footer from '../components/footerButtons';
@@ -23,10 +21,10 @@ function Following() {
     //   isFollowing: true,
     // }
   ]);
-  const hasRun = useRef(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [confirmationUserID, setConfirmationUserID] = useState(null);
-
+  const hasRun = useRef(false);
+  const processedUserIDs = useRef(new Set());
 
 
   // get current userID
@@ -58,8 +56,13 @@ function Following() {
   // get the profiles of the users in the following list
   useEffect(() => {
     if (!userIDList) return;      // Make sure list is not null
+    
     const fetchUsers = async () => {
       for (const userID of userIDList) {
+
+        if (processedUserIDs.current.has(userID)) { continue }  // Check if userID has already been processed
+        processedUserIDs.current.add(userID); 
+        
         if (!followingList.some(user => user.userID === userID)) {   // Make sure user is not already in followingList
           try {
             const response = await fetch(`/api/getUser?userID=${userID}`);
@@ -121,8 +124,6 @@ function Following() {
             .then(response => response.json())
             .then(data => {
               // for any id that is true, add to userID list
-              console.log(idString);
-              console.log(data);
               const ids = idString.split(',');
               data.forEach((follows, index) => {
                 if (follows) {
@@ -185,20 +186,20 @@ function Following() {
     }
 
     // toggle follow with spotify api
-    if (wasFollowing) {
-      // unfollow
-      fetch(`/api/unfollow?id=${otherUserID}`)
-        .catch((error) => { 
-          console.error('Error:', error); 
-        });
-    }
-    else {
-      // follow
-      fetch(`/api/follow?id=${otherUserID}`)
-        .catch((error) => { 
-          console.error('Error:', error);
-        });
-    }
+    // if (wasFollowing) {
+    //   // unfollow
+    //   fetch(`/api/unfollow?id=${otherUserID}`)
+    //     .catch((error) => { 
+    //       console.error('Error:', error); 
+    //     });
+    // }
+    // else {
+    //   // follow
+    //   fetch(`/api/follow?id=${otherUserID}`)
+    //     .catch((error) => { 
+    //       console.error('Error:', error);
+    //     });
+    // }
   }
 
   //TODO: implement search and infinite scroll

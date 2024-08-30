@@ -2,8 +2,6 @@ import React, {useState, useEffect} from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import followingCheck from '../assets/followingCheck.png';
-import addFollowerIcon from '../assets/addFollowerIcon.png';
 import magnifyingGlass from '../assets/magnifyingGlass.png';
 import x from '../assets/x.png';
 import submit from '../assets/submit.png';
@@ -15,7 +13,7 @@ import DisplayRecentlyPlayed from '../components/recentlyPlayed';
 function Explore() {
   const [userCount, setUserCount] = useState(0);                          // number of users in the DB
   const [userID, setUserID] = useState('');                               // current user's ID
-  const [followedUserIDList, setFollowedUserIDList] = useState([]);       // list of IDs of users that current user follows
+  const [followedUserIDList, setFollowedUserIDList] = useState(null);       // list of IDs of users that current user follows
   const [userIDList, setuserIDList] = useState([]);                       // list of IDs of users that current user does not follow   
   const [displayList, setDisplayList] = useState([
     // {
@@ -76,9 +74,8 @@ function Explore() {
 
   // get initial list of userIDs to display once followedUserIDList is populated
   useEffect(() => {
-    if (followedUserIDList.length > 0 && !initialListLoaded) {
+    if (followedUserIDList && !initialListLoaded) {
       getDisplayUsers(0);
-      console.log('initial list loaded');
       setInitialListLoaded(true);       // Prevents this useEffect from running again
     }
   }, [followedUserIDList]);
@@ -107,7 +104,6 @@ function Explore() {
     //   }
     // });
     
-    console.log('fetching the profiles of users');
     const fetchUsers = userIDList.map(userID => {
       if (!displayList.some(user => user.userID === userID)) {   // Make sure user is not already in displayList
         return fetch(`/api/getUser?userID=${userID}`)
@@ -159,7 +155,6 @@ function Explore() {
         axios.get(`/api/followCheck?ids=${idString}`)
           .then(response => {
             const data = response.data;
-            console.log(data);
             if (!Array.isArray(data)) {
               console.error('Error: ', data, ' not an array');
               return;
@@ -232,20 +227,20 @@ function Explore() {
     }
 
     // toggle follow with spotify api
-    if (wasFollowing) {
-      // unfollow
-      fetch(`/api/unfollow?id=${otherUserID}`)
-        .catch((error) => { 
-          console.error('Error:', error); 
-        });
-    }
-    else {
-      // follow
-      fetch(`/api/follow?id=${otherUserID}`)
-        .catch((error) => { 
-          console.error('Error:', error);
-        });
-    }
+    // if (wasFollowing) {
+    //   // unfollow
+    //   fetch(`/api/unfollow?id=${otherUserID}`)
+    //     .catch((error) => { 
+    //       console.error('Error:', error); 
+    //     });
+    // }
+    // else {
+    //   // follow
+    //   fetch(`/api/follow?id=${otherUserID}`)
+    //     .catch((error) => { 
+    //       console.error('Error:', error);
+    //     });
+    // }
 
     // update followedUserIDList
     if (wasFollowing) {
@@ -276,7 +271,6 @@ function Explore() {
         };
         const response = await axios.get(`/api/searchUsers?query=${searchInput}`, getData);   
         const users = response.data;      
-        console.log(users);      
         // Add each userID from users to userIDList
         let userIDList = [];
         users.forEach(user => {

@@ -25,7 +25,7 @@ function Login() {
             onClick={handleLogin}>
             Login with Spotify
           </button>
-          <p className='h4'>Dont have a spotify account?</p>
+          <p className='h4'>Don't have a spotify account?</p>
           <p className='h4'>join <a href='https://www.spotify.com/us/signup'>here</a></p>
         </div>
       </div>

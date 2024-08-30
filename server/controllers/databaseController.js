@@ -99,7 +99,6 @@ updateUser = async function(req, res) {
 // toggle privacy setting
 changePrivacy = async function(req, res) {
   try {
-    console.log(req.body);
 
     // Atomically find the user and update its privacy
     const updatedUser = await user.findOneAndUpdate(
@@ -122,7 +121,6 @@ changePrivacy = async function(req, res) {
 // update the user's list of followed users
 addToFollowing = async function(req, res) {
   try {
-    console.log(req.body);
 
     // Atomically find the user and append to its list of following
     const updatedUser = await user.findOneAndUpdate(
@@ -147,7 +145,6 @@ addToFollowing = async function(req, res) {
 // update the user's list of followed users
 removeFromFollowing = async function(req, res) {
   try {
-    console.log(req.body);
 
     // Atomically find the user and remove from its list of following
     const updatedUser = await user.findOneAndUpdate(
@@ -196,7 +193,6 @@ getAllUserIDs = async function(req, res) {
 searchUsers = async function(req, res) {
 
   const searchQuery = req.query.query;
-  console.log("search input: ", searchQuery);
 
   if (!searchQuery) {
     res.json([])

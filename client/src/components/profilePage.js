@@ -45,11 +45,9 @@ function ProfilePage({DBID}) {
   // convert DBID to displayedUserID
   useEffect(() => {
     if (DBID) {
-      console.log('DBID: ',DBID);
       fetch(`/api/convertDBIDToUserID?DBID=${DBID}`)
         .then(response => response.json())
         .then(data => {
-          console.log('userID : ',data);
           setDisplayedUserID(data);
         })
         .catch((error) => { 
@@ -58,14 +56,12 @@ function ProfilePage({DBID}) {
     }
     else {
       setDisplayedUserID('');
-      console.log('no DBID');
     }
   }, []);
 
   // get profile pic, username, and userID    and   update DB if neccisary 
   useEffect(() => {
     if (displayedUserID === null) return;
-    console.log('test')
 
     const fetchData = async () => {
       try {
@@ -76,11 +72,9 @@ function ProfilePage({DBID}) {
           setOtherUserIsDisplayed(false);
           setWasOriginallyFollowed(false);  // doesn't matter, but need this line in order for loading to finish
           setUserID(data.id); 
-          console.log('current user ID: ', data.id);
           setProfilePic(data.images[1].url);
           setUserName(data.display_name);
           setFollowerCount(data.followers.total);
-          console.log(data);
 
           // for personalized message
           if (data.id === '22o22cwit6gnvviwcfsc6l5pi') {   
@@ -183,7 +177,6 @@ function ProfilePage({DBID}) {
         .then(data => {
           const songNArtist = data.items[0].track.name + ' ~ ' + data.items[0].track.artists[0].name;
           setRecentlyPlayed(songNArtist);
-          console.log("recent songs: ", data);
           // update DB
           const putData = {
             "userID": userID,
@@ -292,13 +285,11 @@ function ProfilePage({DBID}) {
 
   // get top songs
   async function handleTopSongs(timeFrame, count, init = false, loadOnPage = true) {
-    console.log('test ID: ', userID);
     if (userID) {
       fetch(`/api/topSongs?timeFrame=${timeFrame}&count=${count}&init=${init}`)
         .then(response => response.json())
         .then(data => {
           if (loadOnPage) {
-            console.log('song data: ',data);
             setSongs(data.items.map(item => item.name));
             setSongPics(data.items.map(item => item.album.images[0].url));
             setSongSingers(data.items.map(item => item.artists[0].name));
@@ -338,7 +329,6 @@ function ProfilePage({DBID}) {
       fetch(`/api/topGenres?timeFrame=${timeFrame}&init=${init}`)
         .then(response => response.json())
         .then(data => {
-          // console.log(timeFrame,' genres: ',data);
           if (loadOnPage) {
             var newGenres = data.map(pair => pair[0]);
             setGenres(newGenres);
@@ -466,6 +456,7 @@ function ProfilePage({DBID}) {
       console.error('Logout failed:', error);
     }
   }
+
 
   return (
     <div className='color-border'>      
@@ -737,9 +728,7 @@ function ProfilePage({DBID}) {
                   <li key={index} className="genre-item">
                     <div className="genre-item-content">
                       <div className="genre-item-index">{index + 1}</div>
-                      <div className="genre-item-info">
-                        <div>{genre}</div>
-                      </div>
+                      <a className="genre-item-link"href={`https://open.spotify.com/search/${genre}`}>{genre}</a>
                     </div>
                   </li>
                 ))}

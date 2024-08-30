@@ -5,11 +5,9 @@ const ProtectedRoute = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(null);
 
     useEffect(() => {
-        console.log('protected route entered');
         fetch(`/api/ensureAuth`)
             .then(response => response.json())
             .then(data => {
-                console.log('callback from ensureAuth');
                 if (data.isAuthenticated && data.isAuthenticated === 'true') {
                     setIsAuthenticated(true);    
                 } else {
@@ -25,7 +23,6 @@ const ProtectedRoute = ({ children }) => {
     if (isAuthenticated === null) {
         return null; // or a loading spinner
     }
-    console.log(isAuthenticated);
     
     return isAuthenticated ? children : <Navigate to="/" replace />;
 };

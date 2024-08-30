@@ -14,8 +14,6 @@ router.get('/topGenres', spotifyController.topGenres);
 
 router.get('/profileInfo', spotifyController.profileInfo);
 
-router.get('/test', spotifyController.test);
-
 router.get('/ensureAuth', spotifyController.ensureAuth);
 
 router.get('/followCheck', spotifyController.followCheck);

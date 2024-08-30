@@ -26,7 +26,7 @@
   display: inline-block;
   font-size: 16px;
   transition: opacity .5s ease-in-out;
-  cursor: pointer;  
+  cursor: pointer;
 }
 
 .active-footer-button {

@@ -5,6 +5,10 @@ body {
   caret-color: transparent;
 }
 
+* {
+  -webkit-tap-highlight-color: transparent; /*Disable touch highlight for touchscreen */
+}
+
 /* color border */
 @keyframes gradient {
   0% { background-position: 0% 50%; }
@@ -53,13 +57,13 @@ body {
   align-items: center;
   width: 100%;
   justify-content: center;
-  /* padding: 10px 0; */
 }
 
 .profile-image {
   width: 30%;
   max-width: 200px; 
   border-radius: 50%;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
 }
 
 .profile-info {
@@ -197,7 +201,7 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: white;
+  background-color: #f0f0f0;
   padding: 20px;
   border-radius: 10px;
   text-align: center;
@@ -225,7 +229,7 @@ body {
   margin: 0 5px;
   border-radius: 50px;
   border: none;
-  background-color: #f0f0f0;
+  background-color: #e3e1e1;
   color: #000;
   cursor: pointer;
   text-align: center;
@@ -233,7 +237,7 @@ body {
 }
 
 .pro-confirm-button:hover {
-  background-color: #e6e6e6; 
+  background-color: #d8d8d8; 
 }
 
 /* ------------------- body ------------------- */
@@ -430,9 +434,13 @@ body {
   color: #f0f0f0;
 }
 
-.genre-item-info {
+.genre-item-link {
   margin-left: 10px;
   color: #f0f0f0;
+  text-decoration: none;
+}
+.genre-item-link:hover {
+  color: #c6c6c6;
 }
 
 /* private user message */

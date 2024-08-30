@@ -168,7 +168,7 @@ topArtists = function(req, res) {
   axios.get(options.url, { headers: options.headers })
     .then(async function(response) {
       var body = response.data;
-      // console.log(body);
+
       // update database if init is true (first rendering of the user's profile)
       if (init) {
         // get user ID
@@ -226,7 +226,7 @@ topSongs = function(req, res) {
   axios.get(options.url, { headers: options.headers })
     .then(async function(response) {
       var body = response.data;
-      // console.log(body);
+
       // update database if init is true (first rendering of the user's profile)
       if (init) {
         // get user ID
@@ -379,16 +379,6 @@ topGenres = async function(req, res) {
   res.json(sortedGenreRanks.slice(0, 50));
 }
 
-// TODO: delete this function and route
-test = function(req, res) {
-  if (req.session.name) {
-    console.log(req.session.name);
-  }
-  req.session.test = 'test123';
-  req.session.name = "bob";
-  res.json(req.session);
-}
-
 // get request for profile picture and display_name(username)
 profileInfo = function(req, res) {
   getProfileInfo(req.session.accessToken)
@@ -480,11 +470,9 @@ followCheck = function(req, res) {
       'Authorization': 'Bearer ' + req.session.accessToken 
     }
   };
-  console.log(options);
 
   axios.get(options.url, { headers: options.headers })
     .then(function(response) {
-      console.log(response.data);
       res.json(response.data);
     })
     .catch(function(error) {
@@ -606,4 +594,4 @@ getFollowerCount = function(req, res) {
       }
     });
 }
-module.exports = { login, callback, topArtists, topSongs, topGenres, profileInfo, test, ensureAuth, followCheck, follow, unfollow, getRecentlyPlayed, getFollowerCount };
+module.exports = { login, callback, topArtists, topSongs, topGenres, profileInfo, ensureAuth, followCheck, follow, unfollow, getRecentlyPlayed, getFollowerCount };
