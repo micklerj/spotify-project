@@ -29,12 +29,12 @@ app.use(session({
   }),
   secret: process.env.SESSION_SECRET,
   resave: false,
-  saveUninitialized: false,  // false = doesnt save unless modified  
+  saveUninitialized: false,      // false = doesnt save unless modified  
   cookie: { 
-    secure: false,
+    secure: true,                // false when in development, true in production (for HTTPS)
     httpOnly: true,
     maxAge: 1000 * 60 * 60 * 24, // 1 day
-   }                            // Set secure: true in production with HTTPS
+   }                             
 }))
 
 // Middleware for json
