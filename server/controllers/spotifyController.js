@@ -90,10 +90,13 @@ callback = function(req, res) {
 
     request.post(authOptions, async function(error, response, body) {
       if (!error && response.statusCode === 200) { 
+        console.log('Received tokens:', body);
  
         req.session.accessToken = body.access_token,
         req.session.refreshToken = body.refresh_token;
         req.session.tokenExpirationTime = Date.now() + (body.expires_in * 1000); // 1 hour in milliseconds
+
+        console.log('Session after setting tokens:', req.session);
 
         // --------------------------------------------------------------------------
         // create new user if it doesn't exist

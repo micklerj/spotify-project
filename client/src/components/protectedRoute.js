@@ -8,6 +8,7 @@ const ProtectedRoute = ({ children }) => {
         fetch(`/api/ensureAuth`)
             .then(response => response.json())
             .then(data => {
+                console.log(data);
                 if (data.isAuthenticated && data.isAuthenticated === 'true') {
                     setIsAuthenticated(true);    
                 } else {
@@ -25,6 +26,7 @@ const ProtectedRoute = ({ children }) => {
     }
     
     return isAuthenticated ? children : <Navigate to="/" replace />;
+    // return children;
 };
 
 export default ProtectedRoute; 
