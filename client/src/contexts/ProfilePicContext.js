@@ -8,7 +8,7 @@ export const ProfilePicProvider = ({ children }) => {
   useEffect(() => {
     async function fetchProfileInfo() {
       try {
-        const response = await fetch('/api/profileInfo');
+        const response = await fetch('https://spotify-project-lhca.onrender.com/api/profileInfo');
         const data = await response.json();
         setProfilePic(data.images[1].url);
       } catch (error) {

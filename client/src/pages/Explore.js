@@ -39,7 +39,7 @@ function Explore() {
 
   // get current userID   and   user count
   useEffect(() => {
-    fetch('/api/profileInfo')
+    fetch('https://spotify-project-lhca.onrender.com/api/profileInfo')
       .then(response => response.json())
       .then(data => {
         setUserID(data.id);
@@ -48,7 +48,7 @@ function Explore() {
         console.error('Error:', error); 
       });
 
-    fetch('/api/getUserCount')
+    fetch('https://spotify-project-lhca.onrender.com/api/getUserCount')
       .then(response => response.json())
       .then(data => {
         setUserCount(data.count);
@@ -61,7 +61,7 @@ function Explore() {
   // get the current user's following list from DB
   useEffect(() => {
     if (userID) {               // Make sure ID is not null
-      fetch(`/api/getUser?userID=${userID}`)
+      fetch(`https://spotify-project-lhca.onrender.com/api/getUser?userID=${userID}`)
         .then(response => response.json())
         .then(data => {
           setFollowedUserIDList(data.following);
@@ -84,7 +84,7 @@ function Explore() {
   useEffect(() => {
     // userIDList.forEach((userID) => {          // ----------- this version does not retain the order ------------
     //   if (!displayList.some(user => user.userID === userID)) {   
-    //     fetch(`/api/getUser?userID=${userID}`)
+    //     fetch(`https://spotify-project-lhca.onrender.com/api/getUser?userID=${userID}`)
     //       .then(response => response.json())
     //       .then(data => {
     //         setDisplayList(prevDisplayList => [
@@ -106,7 +106,7 @@ function Explore() {
     
     const fetchUsers = userIDList.map(userID => {
       if (!displayList.some(user => user.userID === userID)) {   // Make sure user is not already in displayList
-        return fetch(`/api/getUser?userID=${userID}`)
+        return fetch(`https://spotify-project-lhca.onrender.com/api/getUser?userID=${userID}`)
           .then(response => response.json())
           .then(data => {
             return {
@@ -136,7 +136,7 @@ function Explore() {
   async function getDisplayUsers(DBStartIndex = 0) {
     let idString = '';
     const limit = 15;  // cant be more than 50
-    fetch(`/api/getAllUserIDs?start=${DBStartIndex}&limit=${limit}`)
+    fetch(`https://spotify-project-lhca.onrender.com/api/getAllUserIDs?start=${DBStartIndex}&limit=${limit}`)
       .then(response => response.json())
       .then(data => {
         // increment DB index
@@ -152,7 +152,7 @@ function Explore() {
           }      
         });
         // check if current user follows them
-        axios.get(`/api/followCheck?ids=${idString}`)
+        axios.get(`https://spotify-project-lhca.onrender.com/api/followCheck?ids=${idString}`)
           .then(response => {
             const data = response.data;
             if (!Array.isArray(data)) {
@@ -171,7 +171,7 @@ function Explore() {
                   "userID": userID,      // current user
                   "follow": ids[index]   // followed user
                 };
-                axios.put('/api/addToFollowing', putData)      
+                axios.put('https://spotify-project-lhca.onrender.com/api/addToFollowing', putData)      
                   .catch((error) => { 
                     console.error('Error:', error); 
                   });
@@ -209,7 +209,7 @@ function Explore() {
         "userID": userID,       // current user
         "remove": otherUserID   // followed user
       };
-      axios.put('/api/removeFromFollowing', putData)      
+      axios.put('https://spotify-project-lhca.onrender.com/api/removeFromFollowing', putData)      
         .catch((error) => { 
           console.error('Error:', error); 
         });
@@ -220,7 +220,7 @@ function Explore() {
         "userID": userID,       // current user
         "follow": otherUserID   // followed user
       };
-      axios.put('/api/addToFollowing', putData)      
+      axios.put('https://spotify-project-lhca.onrender.com/api/addToFollowing', putData)      
         .catch((error) => { 
           console.error('Error:', error); 
         });
@@ -229,14 +229,14 @@ function Explore() {
     // toggle follow with spotify api
     if (wasFollowing) {
       // unfollow
-      fetch(`/api/unfollow?id=${otherUserID}`)
+      fetch(`https://spotify-project-lhca.onrender.com/api/unfollow?id=${otherUserID}`)
         .catch((error) => { 
           console.error('Error:', error); 
         });
     }
     else {
       // follow
-      fetch(`/api/follow?id=${otherUserID}`)
+      fetch(`https://spotify-project-lhca.onrender.com/api/follow?id=${otherUserID}`)
         .catch((error) => { 
           console.error('Error:', error);
         });
@@ -269,7 +269,7 @@ function Explore() {
         const getData = {
           "query": searchInput,       // search query
         };
-        const response = await axios.get(`/api/searchUsers?query=${searchInput}`, getData);   
+        const response = await axios.get(`https://spotify-project-lhca.onrender.com/api/searchUsers?query=${searchInput}`, getData);   
         const users = response.data;      
         // Add each userID from users to userIDList
         let userIDList = [];

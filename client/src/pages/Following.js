@@ -29,7 +29,7 @@ function Following() {
 
   // get current userID
   useEffect(() => {
-    fetch('/api/profileInfo')
+    fetch('https://spotify-project-lhca.onrender.com/api/profileInfo')
       .then(response => response.json())
       .then(data => {
         setUserID(data.id);
@@ -42,7 +42,7 @@ function Following() {
   // first add current user's following list from DB
   useEffect(() => {
     if (!userID) return;               // Make sure ID is not null
-    fetch(`/api/getUser?userID=${userID}`)
+    fetch(`https://spotify-project-lhca.onrender.com/api/getUser?userID=${userID}`)
       .then(response => response.json())
       .then(data => {
         setuserIDList(data.following);
@@ -65,7 +65,7 @@ function Following() {
         
         if (!followingList.some(user => user.userID === userID)) {   // Make sure user is not already in followingList
           try {
-            const response = await fetch(`/api/getUser?userID=${userID}`);
+            const response = await fetch(`https://spotify-project-lhca.onrender.com/api/getUser?userID=${userID}`);
             const data = await response.json();
             setFollowingList(prevFollowingList => [
               ...prevFollowingList,
@@ -101,7 +101,7 @@ function Following() {
   async function getOtherFollowedUsers() {
     let idStrings = [''];
     let count = 0;
-    fetch(`/api/getAllUserIDs`)
+    fetch(`https://spotify-project-lhca.onrender.com/api/getAllUserIDs`)
       .then(response => response.json())
       .then(data => {
         data.userIDs.forEach((id) => {
@@ -120,7 +120,7 @@ function Following() {
         });
         // check if current user follows them
         for (let idString of idStrings) {
-          fetch(`/api/followCheck?ids=${idString}`)
+          fetch(`https://spotify-project-lhca.onrender.com/api/followCheck?ids=${idString}`)
             .then(response => response.json())
             .then(data => {
               // for any id that is true, add to userID list
@@ -133,7 +133,7 @@ function Following() {
                     "userID": userID,      // current user
                     "follow": ids[index]   // followed user
                   };
-                  axios.put('/api/addToFollowing', putData)      
+                  axios.put('https://spotify-project-lhca.onrender.com/api/addToFollowing', putData)      
                     .catch((error) => { 
                       console.error('Error:', error); 
                     });
@@ -168,7 +168,7 @@ function Following() {
         "userID": userID,       // current user
         "remove": otherUserID   // followed user
       };
-      axios.put('/api/removeFromFollowing', putData)      
+      axios.put('https://spotify-project-lhca.onrender.com/api/removeFromFollowing', putData)      
         .catch((error) => { 
           console.error('Error:', error); 
         });
@@ -179,7 +179,7 @@ function Following() {
         "userID": userID,       // current user
         "follow": otherUserID   // followed user
       };
-      axios.put('/api/addToFollowing', putData)      
+      axios.put('https://spotify-project-lhca.onrender.com/api/addToFollowing', putData)      
         .catch((error) => { 
           console.error('Error:', error); 
         });
@@ -188,14 +188,14 @@ function Following() {
     // toggle follow with spotify api
     if (wasFollowing) {
       // unfollow
-      fetch(`/api/unfollow?id=${otherUserID}`)
+      fetch(`https://spotify-project-lhca.onrender.com/api/unfollow?id=${otherUserID}`)
         .catch((error) => { 
           console.error('Error:', error); 
         });
     }
     else {
       // follow
-      fetch(`/api/follow?id=${otherUserID}`)
+      fetch(`https://spotify-project-lhca.onrender.com/api/follow?id=${otherUserID}`)
         .catch((error) => { 
           console.error('Error:', error);
         });

@@ -5,7 +5,9 @@ const ProtectedRoute = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(null);
 
     useEffect(() => {
-        fetch(`/api/ensureAuth`)
+        fetch('https://spotify-project-lhca.onrender.com/api/ensureAuth', {
+            credentials: 'include', // Ensure cookies are included in the request
+        })
             .then(response => response.json())
             .then(data => {
                 console.log(data);
@@ -25,7 +27,7 @@ const ProtectedRoute = ({ children }) => {
         return null; // or a loading spinner
     }
     
-    return isAuthenticated ? children : <Navigate to="/" replace />;
+    return isAuthenticated ? children : <Navigate to="/" />;
     // return children;
 };
 

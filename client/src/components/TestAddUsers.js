@@ -98,7 +98,7 @@ function TestAddUsers() {
       };
 
       try {
-        await axios.post('/api/newUser', postData);
+        await axios.post('https://spotify-project-lhca.onrender.com/api/newUser', postData);
         console.log(`User ${i + 1} created successfully`);
       } catch (error) {
         console.error(`Error creating user ${i + 1}:`, error);
