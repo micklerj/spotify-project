@@ -1,5 +1,5 @@
 require('dotenv').config();
-const PORT = process.env.port || 3500; //backend will run on local port 3500
+const PORT = process.env.PORT || 3500; //backend will run on local port 3500
 const express = require('express');
 const session = require('express-session');
 const cors = require('cors');
@@ -45,11 +45,6 @@ app.use('/api', require('./routes/spotifyRoutes'));
 
 // database routes
 app.use('/api', require('./routes/databaseRoutes'));
-
-app.get('/api/example', (req, res) => {
-  res.json({ message: 'Hello from server!' });
-});
-
 
 
 mongoose.connection.once('open', () => {

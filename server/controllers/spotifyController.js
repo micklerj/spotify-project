@@ -419,6 +419,8 @@ function getProfileInfo(accessToken) {
 
 // logic for checking if a user is authenticated
 ensureAuth = async function(req, res, next) {
+  console.log('session during ensureAuth: ', req.session);
+  
   if (!req.session.accessToken || !req.session.refreshToken) {
     // user is not authenticated
     console.log('User is not authenticated');
