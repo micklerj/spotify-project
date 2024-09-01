@@ -31,9 +31,11 @@ app.use(session({
   resave: false,
   saveUninitialized: false,      // false = doesnt save unless modified  
   cookie: { 
-    secure: true,                // false when in development, true in production (for HTTPS)
+    secure: false,                // false when in development, true in production (for HTTPS)
     httpOnly: true,
     maxAge: 1000 * 60 * 60 * 24, // 1 day
+    sameSite: 'None', // Ensure cookies are sent across different domains
+    path: '/' // Ensure the cookie is available on all routes
    }                             
 }))
 
