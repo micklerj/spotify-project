@@ -45,7 +45,7 @@ function ProfilePage({DBID}) {
   // convert DBID to displayedUserID
   useEffect(() => {
     if (DBID) {
-      fetch(`https://spotify-project-lhca.onrender.com/api/convertDBIDToUserID?DBID=${DBID}`)
+      fetch(`http://localhost:3500/api/convertDBIDToUserID?DBID=${DBID}`)
         .then(response => response.json())
         .then(data => {
           setDisplayedUserID(data);
@@ -65,7 +65,7 @@ function ProfilePage({DBID}) {
 
     const fetchData = async () => {
       try {
-        const response = await fetch('https://spotify-project-lhca.onrender.com/api/profileInfo', {
+        const response = await fetch('http://localhost:3500/api/profileInfo', {
           credentials: 'include',   // Ensure cookies are included in the request
         });
         const data = await response.json();    
@@ -91,7 +91,7 @@ function ProfilePage({DBID}) {
             "followerCount": data.followers.total
           }  
           try {
-            await axios.put('https://spotify-project-lhca.onrender.com/api/updateUser', putData);
+            await axios.put('http://localhost:3500/api/updateUser', putData);
           } catch (error) { 
             console.error('Error:', error);
           }
@@ -100,7 +100,7 @@ function ProfilePage({DBID}) {
           // display user is not the logged in user, get profile from DB   and recently played and privacy
           setOtherUserIsDisplayed(true);
           try {
-            const otherUserResponse = await fetch(`https://spotify-project-lhca.onrender.com/api/getUser?userID=${displayedUserID}`);
+            const otherUserResponse = await fetch(`http://localhost:3500/api/getUser?userID=${displayedUserID}`);
             const otherUserData = await otherUserResponse.json();
             if (otherUserData.message && otherUserData.message === 'User not found') {
               // unvalid userID  ,   nav to 404 page
@@ -124,7 +124,7 @@ function ProfilePage({DBID}) {
           }
 
           // get follower count of other user
-          axios.get(`https://spotify-project-lhca.onrender.com/api/getFollowerCount?id=${displayedUserID}`, { withCredentials: true })
+          axios.get(`http://localhost:3500/api/getFollowerCount?id=${displayedUserID}`, { withCredentials: true })
             .then(response => {
               const data = response.data;
               setFollowerCount(data);
@@ -135,7 +135,7 @@ function ProfilePage({DBID}) {
 
           // determine if other user is followed or not
           try {
-            const currUserResponse = await fetch(`https://spotify-project-lhca.onrender.com/api/getUser?userID=${data.id}`);
+            const currUserResponse = await fetch(`http://localhost:3500/api/getUser?userID=${data.id}`);
             const currUserData = await currUserResponse.json();
             if (currUserData.following.includes(displayedUserID)) {
               setOtherUserIsFollowed(true);
@@ -160,7 +160,7 @@ function ProfilePage({DBID}) {
   // get privacy setting  (of currently logged in user)
   useEffect(() => {    
     if (userID) {           // Make sure ID is not null
-      fetch(`https://spotify-project-lhca.onrender.com/api/getUser?userID=${userID}`)
+      fetch(`http://localhost:3500/api/getUser?userID=${userID}`)
         .then(response => response.json())
         .then(data => {
           setPrivacy(data.privacy);
@@ -174,7 +174,7 @@ function ProfilePage({DBID}) {
   // get recently played song  (of currently logged in user)
   useEffect(() => {
     if (userID) {
-      fetch(`https://spotify-project-lhca.onrender.com/api/getRecentlyPlayed`, { credentials: 'include'})
+      fetch(`http://localhost:3500/api/getRecentlyPlayed`, { credentials: 'include'})
         .then(response => response.json())
         .then(data => {
           const songNArtist = data.items[0].track.name + ' ~ ' + data.items[0].track.artists[0].name;
@@ -184,7 +184,7 @@ function ProfilePage({DBID}) {
             "userID": userID,
             "recentlyPlayed": songNArtist
           }  
-          axios.put('https://spotify-project-lhca.onrender.com/api/updateUser', putData)
+          axios.put('http://localhost:3500/api/updateUser', putData)
             .catch((error) => { 
               console.error('Error:', error);
             })
@@ -250,7 +250,7 @@ function ProfilePage({DBID}) {
   // get top artists
   async function handleTopArtists(timeFrame, count, init = false, loadOnPage = true) {
     if (userID) {
-      axios.get(`https://spotify-project-lhca.onrender.com/api/topArtists?timeFrame=${timeFrame}&count=${count}&init=${init}`, { withCredentials: true })
+      axios.get(`http://localhost:3500/api/topArtists?timeFrame=${timeFrame}&count=${count}&init=${init}`, { withCredentials: true })
         .then(response => {
           const data = response.data;
           if (loadOnPage) {
@@ -272,7 +272,7 @@ function ProfilePage({DBID}) {
       else if (timeFrame === 'medium_term') { topArtistsTime = 'topArtists6M'; }
       else                                  { topArtistsTime = 'topArtists1Y'; }
 
-      fetch(`https://spotify-project-lhca.onrender.com/api/getUser?userID=${displayedUserID}`)
+      fetch(`http://localhost:3500/api/getUser?userID=${displayedUserID}`)
         .then(response => response.json())
         .then(data => {
           setArtists(data[topArtistsTime].map(artist => artist.artistName));
@@ -288,7 +288,7 @@ function ProfilePage({DBID}) {
   // get top songs
   async function handleTopSongs(timeFrame, count, init = false, loadOnPage = true) {
     if (userID) {
-      fetch(`https://spotify-project-lhca.onrender.com/api/topSongs?timeFrame=${timeFrame}&count=${count}&init=${init}`, { credentials: 'include'})
+      fetch(`http://localhost:3500/api/topSongs?timeFrame=${timeFrame}&count=${count}&init=${init}`, { credentials: 'include'})
         .then(response => response.json())
         .then(data => {
           if (loadOnPage) {
@@ -310,7 +310,7 @@ function ProfilePage({DBID}) {
       else if (timeFrame === 'medium_term') { topSongsTime = 'topSongs6M'; }
       else                                  { topSongsTime = 'topSongs1Y'; }
 
-      fetch(`https://spotify-project-lhca.onrender.com/api/getUser?userID=${displayedUserID}`)
+      fetch(`http://localhost:3500/api/getUser?userID=${displayedUserID}`)
         .then(response => response.json())
         .then(data => {
           setSongs(data[topSongsTime].map(song => song.songName));
@@ -328,7 +328,7 @@ function ProfilePage({DBID}) {
   async function handleTopGenres(timeFrame, init = false, loadOnPage = true) { 
     if (userID) {
       // get all 50 top genres from api
-      fetch(`https://spotify-project-lhca.onrender.com/api/topGenres?timeFrame=${timeFrame}&init=${init}`, { credentials: 'include'})
+      fetch(`http://localhost:3500/api/topGenres?timeFrame=${timeFrame}&init=${init}`, { credentials: 'include'})
         .then(response => response.json())
         .then(data => {
           if (loadOnPage) {
@@ -348,7 +348,7 @@ function ProfilePage({DBID}) {
       else if (timeFrame === 'medium_term') { topGenresTime = 'topGenres6M'; }
       else                                  { topGenresTime = 'topGenres1Y'; }
 
-      fetch(`https://spotify-project-lhca.onrender.com/api/getUser?userID=${displayedUserID}`)
+      fetch(`http://localhost:3500/api/getUser?userID=${displayedUserID}`)
         .then(response => response.json())
         .then(data => {
           setGenres(data[topGenresTime]);
@@ -393,7 +393,7 @@ function ProfilePage({DBID}) {
       setPrivacy('Public');
     }
 
-    axios.put('https://spotify-project-lhca.onrender.com/api/changePrivacy', putData)      
+    axios.put('http://localhost:3500/api/changePrivacy', putData)      
       .catch((error) => { 
         console.error('Error:', error); 
       });
@@ -409,7 +409,7 @@ function ProfilePage({DBID}) {
         "userID": userIDDupe,       // current user
         "remove": displayedUserID   // followed user
       };
-      axios.put('https://spotify-project-lhca.onrender.com/api/removeFromFollowing', putData)      
+      axios.put('http://localhost:3500/api/removeFromFollowing', putData)      
         .catch((error) => { 
           console.error('Error:', error); 
         });
@@ -420,7 +420,7 @@ function ProfilePage({DBID}) {
         "userID": userIDDupe,       // current user
         "follow": displayedUserID   // followed user
       };
-      axios.put('https://spotify-project-lhca.onrender.com/api/addToFollowing', putData)      
+      axios.put('http://localhost:3500/api/addToFollowing', putData)      
         .catch((error) => { 
           console.error('Error:', error); 
         });
@@ -429,14 +429,14 @@ function ProfilePage({DBID}) {
     // toggle follow with spotify api
     if (otherUserIsFollowed) {
       // unfollow
-      fetch(`https://spotify-project-lhca.onrender.com/api/unfollow?id=${displayedUserID}`, { credentials: 'include'})
+      fetch(`http://localhost:3500/api/unfollow?id=${displayedUserID}`, { credentials: 'include'})
         .catch((error) => { 
           console.error('Error:', error); 
         });
     }
     else {
       // follow
-      fetch(`https://spotify-project-lhca.onrender.com/api/follow?id=${displayedUserID}`, { credentials: 'include'})
+      fetch(`http://localhost:3500/api/follow?id=${displayedUserID}`, { credentials: 'include'})
         .catch((error) => { 
           console.error('Error:', error);
         });
@@ -450,7 +450,7 @@ function ProfilePage({DBID}) {
   async function handleLogout() {
     try {
       // Send a POST request to your server to invalidate the session
-      await axios.post('https://spotify-project-lhca.onrender.com/api/logout', { withCredentials: true });
+      await axios.post('http://localhost:3500/api/logout', { withCredentials: true });
   
       // Redirect the user to the login page
       window.location.href = '/';

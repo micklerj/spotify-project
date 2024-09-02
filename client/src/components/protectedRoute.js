@@ -5,7 +5,7 @@ const ProtectedRoute = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(null);
 
     useEffect(() => {
-        fetch('https://spotify-project-lhca.onrender.com/api/ensureAuth', {
+        fetch('http://localhost:3500/api/ensureAuth', {
             credentials: 'include', // Ensure cookies are included in the request
         })
             .then(response => response.json())

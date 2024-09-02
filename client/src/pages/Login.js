@@ -4,7 +4,7 @@ import './styles/Login.css';
 function Login() {
 
   async function handleLogin() {
-    window.location.href = 'https://spotify-project-lhca.onrender.com/api/login';
+    window.location.href = 'http://localhost:3500/api/login';
   }
 
   return (
