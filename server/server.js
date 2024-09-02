@@ -34,7 +34,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false,      // false = doesnt save unless modified  
   cookie: { 
-    secure: true,                // false when in development, true in production (for HTTPS)
+    secure: false,                // false when in development, true in production (for HTTPS)
     httpOnly: true,
     maxAge: 1000 * 60 * 60 * 24, // 1 day
     sameSite: 'None', // Ensure cookies are sent across different domains
@@ -45,19 +45,17 @@ app.use(session({
 // Middleware for json
 app.use(express.json());
 
+// Middleware to log session state
+app.use((req, res, next) => {
+  console.log('Session state:', req.session);
+  next();
+});
+
 // Spotify routes
 app.use('/api', require('./routes/spotifyRoutes'));
 
 // database routes
 app.use('/api', require('./routes/databaseRoutes'));
-
-// Middleware to ensure session persistence
-app.use((req, res, next) => {
-  console.log('Session before ensureAuth:', req.session);
-  ensureAuth(req, res, next);
-  console.log('Session after ensureAuth:', req.session);
-  next();
-});
 
 mongoose.connection.once('open', () => {
   console.log("connected to MongoDB");

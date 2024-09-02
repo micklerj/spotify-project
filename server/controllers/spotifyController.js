@@ -436,7 +436,6 @@ ensureAuth = async function(req, res) {
 }
 
 
-
 // refresh access token
 async function refreshAccessToken(req) {
   console.log('refreshing access token');
