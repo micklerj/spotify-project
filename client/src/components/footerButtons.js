@@ -23,7 +23,9 @@ function Footer() {
   useEffect(() => {
     async function fetchProfileInfo() {
       try {
-        const response = await fetch('https://spotify-project-lhca.onrender.com/api/profileInfo');
+        const response = await fetch('https://spotify-project-lhca.onrender.com/api/profileInfo', {
+          credentials: 'include', // Ensure cookies are included in the request
+        });
         const data = await response.json();
         setUserID(data.id);
       } catch (error) {

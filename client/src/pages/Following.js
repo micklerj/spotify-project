@@ -29,7 +29,7 @@ function Following() {
 
   // get current userID
   useEffect(() => {
-    fetch('https://spotify-project-lhca.onrender.com/api/profileInfo')
+    fetch('https://spotify-project-lhca.onrender.com/api/profileInfo', { credentials: 'include'})
       .then(response => response.json())
       .then(data => {
         setUserID(data.id);
@@ -120,7 +120,7 @@ function Following() {
         });
         // check if current user follows them
         for (let idString of idStrings) {
-          fetch(`https://spotify-project-lhca.onrender.com/api/followCheck?ids=${idString}`)
+          fetch(`https://spotify-project-lhca.onrender.com/api/followCheck?ids=${idString}`, { credentials: 'include'})
             .then(response => response.json())
             .then(data => {
               // for any id that is true, add to userID list
@@ -188,14 +188,14 @@ function Following() {
     // toggle follow with spotify api
     if (wasFollowing) {
       // unfollow
-      fetch(`https://spotify-project-lhca.onrender.com/api/unfollow?id=${otherUserID}`)
+      fetch(`https://spotify-project-lhca.onrender.com/api/unfollow?id=${otherUserID}`, { credentials: 'include'})
         .catch((error) => { 
           console.error('Error:', error); 
         });
     }
     else {
       // follow
-      fetch(`https://spotify-project-lhca.onrender.com/api/follow?id=${otherUserID}`)
+      fetch(`https://spotify-project-lhca.onrender.com/api/follow?id=${otherUserID}`, { credentials: 'include'})
         .catch((error) => { 
           console.error('Error:', error);
         });

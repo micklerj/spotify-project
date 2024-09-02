@@ -65,7 +65,9 @@ function ProfilePage({DBID}) {
 
     const fetchData = async () => {
       try {
-        const response = await fetch('https://spotify-project-lhca.onrender.com/api/profileInfo');
+        const response = await fetch('https://spotify-project-lhca.onrender.com/api/profileInfo', {
+          credentials: 'include',   // Ensure cookies are included in the request
+        });
         const data = await response.json();    
   
         if (data.id && (!displayedUserID || displayedUserID === data.id)) {  
@@ -122,7 +124,7 @@ function ProfilePage({DBID}) {
           }
 
           // get follower count of other user
-          axios.get(`https://spotify-project-lhca.onrender.com/api/getFollowerCount?id=${displayedUserID}`)
+          axios.get(`https://spotify-project-lhca.onrender.com/api/getFollowerCount?id=${displayedUserID}`, { withCredentials: true })
             .then(response => {
               const data = response.data;
               setFollowerCount(data);
@@ -172,7 +174,7 @@ function ProfilePage({DBID}) {
   // get recently played song  (of currently logged in user)
   useEffect(() => {
     if (userID) {
-      fetch(`https://spotify-project-lhca.onrender.com/api/getRecentlyPlayed`)
+      fetch(`https://spotify-project-lhca.onrender.com/api/getRecentlyPlayed`, { credentials: 'include'})
         .then(response => response.json())
         .then(data => {
           const songNArtist = data.items[0].track.name + ' ~ ' + data.items[0].track.artists[0].name;
@@ -248,7 +250,7 @@ function ProfilePage({DBID}) {
   // get top artists
   async function handleTopArtists(timeFrame, count, init = false, loadOnPage = true) {
     if (userID) {
-      axios.get(`https://spotify-project-lhca.onrender.com/api/topArtists?timeFrame=${timeFrame}&count=${count}&init=${init}`)
+      axios.get(`https://spotify-project-lhca.onrender.com/api/topArtists?timeFrame=${timeFrame}&count=${count}&init=${init}`, { withCredentials: true })
         .then(response => {
           const data = response.data;
           if (loadOnPage) {
@@ -286,7 +288,7 @@ function ProfilePage({DBID}) {
   // get top songs
   async function handleTopSongs(timeFrame, count, init = false, loadOnPage = true) {
     if (userID) {
-      fetch(`https://spotify-project-lhca.onrender.com/api/topSongs?timeFrame=${timeFrame}&count=${count}&init=${init}`)
+      fetch(`https://spotify-project-lhca.onrender.com/api/topSongs?timeFrame=${timeFrame}&count=${count}&init=${init}`, { credentials: 'include'})
         .then(response => response.json())
         .then(data => {
           if (loadOnPage) {
@@ -326,7 +328,7 @@ function ProfilePage({DBID}) {
   async function handleTopGenres(timeFrame, init = false, loadOnPage = true) { 
     if (userID) {
       // get all 50 top genres from api
-      fetch(`https://spotify-project-lhca.onrender.com/api/topGenres?timeFrame=${timeFrame}&init=${init}`)
+      fetch(`https://spotify-project-lhca.onrender.com/api/topGenres?timeFrame=${timeFrame}&init=${init}`, { credentials: 'include'})
         .then(response => response.json())
         .then(data => {
           if (loadOnPage) {
@@ -427,14 +429,14 @@ function ProfilePage({DBID}) {
     // toggle follow with spotify api
     if (otherUserIsFollowed) {
       // unfollow
-      fetch(`https://spotify-project-lhca.onrender.com/api/unfollow?id=${displayedUserID}`)
+      fetch(`https://spotify-project-lhca.onrender.com/api/unfollow?id=${displayedUserID}`, { credentials: 'include'})
         .catch((error) => { 
           console.error('Error:', error); 
         });
     }
     else {
       // follow
-      fetch(`https://spotify-project-lhca.onrender.com/api/follow?id=${displayedUserID}`)
+      fetch(`https://spotify-project-lhca.onrender.com/api/follow?id=${displayedUserID}`, { credentials: 'include'})
         .catch((error) => { 
           console.error('Error:', error);
         });
@@ -448,7 +450,7 @@ function ProfilePage({DBID}) {
   async function handleLogout() {
     try {
       // Send a POST request to your server to invalidate the session
-      await axios.post('https://spotify-project-lhca.onrender.com/api/logout');
+      await axios.post('https://spotify-project-lhca.onrender.com/api/logout', { withCredentials: true });
   
       // Redirect the user to the login page
       window.location.href = '/';

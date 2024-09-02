@@ -39,7 +39,7 @@ function Explore() {
 
   // get current userID   and   user count
   useEffect(() => {
-    fetch('https://spotify-project-lhca.onrender.com/api/profileInfo')
+    fetch('https://spotify-project-lhca.onrender.com/api/profileInfo', { credentials: 'include'})
       .then(response => response.json())
       .then(data => {
         setUserID(data.id);
@@ -136,7 +136,7 @@ function Explore() {
   async function getDisplayUsers(DBStartIndex = 0) {
     let idString = '';
     const limit = 15;  // cant be more than 50
-    fetch(`https://spotify-project-lhca.onrender.com/api/getAllUserIDs?start=${DBStartIndex}&limit=${limit}`)
+    fetch(`https://spotify-project-lhca.onrender.com/api/getAllUserIDs?start=${DBStartIndex}&limit=${limit}`, { credentials: 'include'})
       .then(response => response.json())
       .then(data => {
         // increment DB index
@@ -152,7 +152,7 @@ function Explore() {
           }      
         });
         // check if current user follows them
-        axios.get(`https://spotify-project-lhca.onrender.com/api/followCheck?ids=${idString}`)
+        axios.get(`https://spotify-project-lhca.onrender.com/api/followCheck?ids=${idString}`, { withCredentials: true })
           .then(response => {
             const data = response.data;
             if (!Array.isArray(data)) {
@@ -229,14 +229,14 @@ function Explore() {
     // toggle follow with spotify api
     if (wasFollowing) {
       // unfollow
-      fetch(`https://spotify-project-lhca.onrender.com/api/unfollow?id=${otherUserID}`)
+      fetch(`https://spotify-project-lhca.onrender.com/api/unfollow?id=${otherUserID}`, { credentials: 'include'})
         .catch((error) => { 
           console.error('Error:', error); 
         });
     }
     else {
       // follow
-      fetch(`https://spotify-project-lhca.onrender.com/api/follow?id=${otherUserID}`)
+      fetch(`https://spotify-project-lhca.onrender.com/api/follow?id=${otherUserID}`, { credentials: 'include'})
         .catch((error) => { 
           console.error('Error:', error);
         });

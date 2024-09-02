@@ -203,10 +203,10 @@ searchUsers = async function(req, res) {
 
   pipeline.push({
     $search: {
-      index: 'user_search', 
+      index: 'searchUser', 
       text: {
         query: searchQuery,
-        path: ['username', 'userID'],
+        path: ['username', 'userID', 'DBID'],
         fuzzy: {}
       },          
     },
