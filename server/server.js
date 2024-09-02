@@ -1,5 +1,5 @@
 require('dotenv').config();
-const PORT = 3500; //backend will run on local port 3500
+const PORT = process.env.PORT || 3500; // dev backend will run on local port 3500
 const express = require('express');
 const session = require('express-session');
 const cors = require('cors');
@@ -37,19 +37,13 @@ app.use(session({
     secure: false,                // false when in development, true in production (for HTTPS)
     httpOnly: true,
     maxAge: 1000 * 60 * 60 * 24, // 1 day
-    sameSite: 'Lax', // Ensure cookies are sent across different domains
-    path: '/' // Ensure the cookie is available on all routes
+    // sameSite: 'None', // Ensure cookies are sent across different domains
+    // path: '/' // Ensure the cookie is available on all routes
    }                             
 }))
 
 // Middleware for json
 app.use(express.json());
-
-// Middleware to log session state
-// app.use((req, res, next) => {
-//   console.log('Session state:', req.session);
-//   next();
-// });
 
 // Spotify routes
 app.use('/api', require('./routes/spotifyRoutes'));
