@@ -435,13 +435,7 @@ ensureAuth = async function(req, res) {
   return res.json({ isAuthenticated: 'true' });
 }
 
-// Middleware to ensure session persistence
-app.use((req, res, next) => {
-  console.log('Session before ensureAuth:', req.session);
-  ensureAuth(req, res, next);
-  console.log('Session after ensureAuth:', req.session);
-  next();
-});
+
 
 // refresh access token
 async function refreshAccessToken(req) {

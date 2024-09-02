@@ -51,6 +51,13 @@ app.use('/api', require('./routes/spotifyRoutes'));
 // database routes
 app.use('/api', require('./routes/databaseRoutes'));
 
+// Middleware to ensure session persistence
+app.use((req, res, next) => {
+  console.log('Session before ensureAuth:', req.session);
+  ensureAuth(req, res, next);
+  console.log('Session after ensureAuth:', req.session);
+  next();
+});
 
 mongoose.connection.once('open', () => {
   console.log("connected to MongoDB");
