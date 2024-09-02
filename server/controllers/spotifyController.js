@@ -384,6 +384,8 @@ topGenres = async function(req, res) {
 
 // get request for profile picture and display_name(username)
 profileInfo = function(req, res) {
+  console.log('session during profileInfo: ', req.session);
+  console.log('and accessToken: ', req.session.accessToken);
   getProfileInfo(req.session.accessToken)
     .then(body => {
       res.json(body);
