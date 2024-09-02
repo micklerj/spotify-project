@@ -8,7 +8,7 @@ const qs = require('qs');
 
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
-const REDIRECT_URI = 'http://localhost:3500/api/callback'
+const REDIRECT_URI = 'https://spotify-project-lhca.onrender.com/api/callback'
 
 var stateKey = 'spotify_auth_state';
 
@@ -108,7 +108,7 @@ callback = function(req, res) {
           const response = await axios.get(options.url, { headers: options.headers });
           const body = response.data;
         
-          const userCountResponse = await axios.get('http://localhost:3500/api/getUserCount');
+          const userCountResponse = await axios.get('https://spotify-project-lhca.onrender.com/api/getUserCount');
           const userCount = userCountResponse.data.count;
         
           const postData = {
@@ -130,7 +130,7 @@ callback = function(req, res) {
             "topGenres1Y": []
           }
         
-          await axios.post('http://localhost:3500/api/newUser', postData);
+          await axios.post('https://spotify-project-lhca.onrender.com/api/newUser', postData);
         
           res.redirect('http://localhost:3000/profile');
         } catch (error) {
@@ -196,7 +196,7 @@ topArtists = function(req, res) {
           [topArtistsTime]: artistArray
         }
 
-        axios.put('http://localhost:3500/api/updateUser', putData)
+        axios.put('https://spotify-project-lhca.onrender.com/api/updateUser', putData)
           .catch((error) => { 
             console.error('Error:', error);
           })
@@ -255,7 +255,7 @@ topSongs = function(req, res) {
           [topSongsTime]: songArray
         }
 
-        axios.put('http://localhost:3500/api/updateUser', putData)
+        axios.put('https://spotify-project-lhca.onrender.com/api/updateUser', putData)
           .catch((error) => { 
             console.error('Error:', error);
           })
@@ -373,7 +373,7 @@ topGenres = async function(req, res) {
       [topGenresTime]: sortedGenreRanks.slice(0, 10).map(pair => pair[0])
     }
 
-    await axios.put('http://localhost:3500/api/updateUser', putData)
+    await axios.put('https://spotify-project-lhca.onrender.com/api/updateUser', putData)
       .catch((error) => { 
         console.error('Error:', error);
       })
