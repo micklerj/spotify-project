@@ -23,7 +23,7 @@ function App() {
             </ProtectedRoute>
           } />
           <Route path="/following" element={ 
-            <ProtectedRoute>
+            <ProtectedRoute >
               <Following /> 
             </ProtectedRoute>
           } />
