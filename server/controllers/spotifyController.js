@@ -414,14 +414,13 @@ function getProfileInfo(accessToken) {
 }
 
 // logic for checking if a user is authenticated
-ensureAuth = async function(req, res, next) {
+ensureAuth = async function(req, res) {
   console.log('session during ensureAuth: ', req.session);
 
   if (!req.session.accessToken || !req.session.refreshToken) {
     // user is not authenticated
     console.log('User is not authenticated');
     return res.json({ isAuthenticated: 'false' });
-    // res.redirect('http://localhost:3000'); 
   }
   
   const currentTime = Date.now();
@@ -435,6 +434,14 @@ ensureAuth = async function(req, res, next) {
   console.log('User is authenticated');
   return res.json({ isAuthenticated: 'true' });
 }
+
+// Middleware to ensure session persistence
+app.use((req, res, next) => {
+  console.log('Session before ensureAuth:', req.session);
+  ensureAuth(req, res, next);
+  console.log('Session after ensureAuth:', req.session);
+  next();
+});
 
 // refresh access token
 async function refreshAccessToken(req) {
