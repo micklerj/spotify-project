@@ -20,7 +20,7 @@ app.use(cookieParser());
 app.use(express.static(__dirname + '/public'));
 
 // Trust the first proxy if behind a proxy or load balancer
-// app.set('trust proxy', 1);
+app.set('trust proxy', 1);
 
 // session for managing access and refresh tokens
 app.use(session({          
