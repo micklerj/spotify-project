@@ -43,7 +43,7 @@ function Footer() {
         setIsLoggedInUser(true);
       }
     }
-  }, [userID, isProfile]);
+  }, [userID, isProfile, location.pathname]);
 
   // set loading to false when profilePic is loaded
   useEffect(() => {

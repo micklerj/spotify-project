@@ -121,13 +121,18 @@ function Explore() {
           })
           .catch((error) => { 
             console.error('Error:', error); 
+            return null; // Ensure the promise resolves to null on error
           });
       }
+      return Promise.resolve(null); // Return a resolved promise with null
     });
   
     Promise.all(fetchUsers)
       .then(users => {
         setDisplayList(prevDisplayList => [...prevDisplayList, ...users.filter(Boolean)]);
+      })
+      .catch(error => {
+        console.error('Error fetching users:', error);
       });
     
   }, [userIDList]);

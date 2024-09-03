@@ -7,9 +7,6 @@ import Explore from './pages/Explore';
 import ProtectedRoute from './components/protectedRoute';
 
 
-import logo from './logo.svg';
-
-
 function App() {
 
   return (

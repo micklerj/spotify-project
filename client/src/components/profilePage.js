@@ -57,7 +57,7 @@ function ProfilePage({DBID}) {
     else {
       setDisplayedUserID('');
     }
-  }, []);
+  }, [DBID]);
 
   // get profile pic, username, and userID    and   update DB if neccisary 
   useEffect(() => {
@@ -466,7 +466,7 @@ function ProfilePage({DBID}) {
       {(userID || userIDDupe) && (
         <div className="profile-container">
           <div className="profile-content">
-            <img src={profilePic} alt="Profile Picture" className="profile-image" />
+            <img src={profilePic} className="profile-image" />
             <div className="profile-info">
               <h1 className="username">{userName}</h1>
               <div className="song">
@@ -475,6 +475,7 @@ function ProfilePage({DBID}) {
               <div className='privacy-n-followers'>
                 {(privacy === 'Public' || privacy === 'Private') && (
                   <img 
+                    alt='privacy'
                     src={privacy === 'Public' ? publicIcon : privateIcon} 
                     className='privacy-icon'
                     onClick={otherUserIsDisplayed ? null : () => setShowPrivacyConfirmation(true)}
@@ -677,7 +678,7 @@ function ProfilePage({DBID}) {
                         <div>{songSingers[index]}</div>
                       </div>
                     </div>
-                    <img src={songPics[index]} className="song-item-image" />
+                    <img src={songPics[index]} alt='songPic' className="song-item-image" />
                   </li>
                 ))}
               </ol>

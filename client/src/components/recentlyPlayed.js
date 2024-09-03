@@ -36,7 +36,7 @@ const DisplayRecentlyPlayed = ({ songTitle }) => {
 
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
-      <img className="musiic-note-icon" src= {musicNote}/>
+      <img className="musiic-note-icon" alt='musicNote' src= {musicNote}/>
       <div className="song-title-container">
         <div className="title-wrapper">
           <div className="song-title" ref={titleRef}>
