@@ -12,7 +12,7 @@ const app = express();
 
 connectDB();
 const corsOptions = { 
-  origin: 'https://clever-salmiakki-41791b.netlify.app',
+  origin: 'https://wraptify.com',
   credentials: true,  
 };
 app.use(cors(corsOptions));

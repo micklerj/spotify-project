@@ -60,13 +60,13 @@ callback = function(req, res) {
   var state = req.query.state || null;
   var storedState = req.cookies ? req.cookies[stateKey] : null;
   if (state === null || state !== storedState) {
-    res.redirect('https://clever-salmiakki-41791b.netlify.app?' +
+    res.redirect('https://wraptify.com?' +
       querystring.stringify({
         error: 'state_mismatch'
       })
     );
   } else if (code === null) {
-    res.redirect('https://clever-salmiakki-41791b.netlify.app?' +
+    res.redirect('https://wraptify.com?' +
       querystring.stringify({
         error: 'not_authorized'
       })
@@ -132,7 +132,7 @@ callback = function(req, res) {
         
           await axios.post('https://spotify-project-lhca.onrender.com/api/newUser', postData);
         
-          res.redirect('https://clever-salmiakki-41791b.netlify.app/profile');
+          res.redirect('https://wraptify.com/profile');
         } catch (error) {
           console.error('Error:', error);
           res.status(500).send('An error occurred');
@@ -140,7 +140,7 @@ callback = function(req, res) {
         // --------------------------------------------------------------------------
 
       } else {
-        res.redirect('https://clever-salmiakki-41791b.netlify.app?' +
+        res.redirect('https://wraptify.com?' +
           querystring.stringify({
             error: 'invalid_token'
           })
