@@ -450,7 +450,7 @@ function ProfilePage({DBID}) {
   async function handleLogout() {
     try {
       // Send a POST request to your server to invalidate the session
-      await axios.post('https://spotify-project-lhca.onrender.com/api/logout', { withCredentials: true });
+      await axios.post('https://spotify-project-lhca.onrender.com/api/logout', {}, { withCredentials: true });
   
       // Redirect the user to the login page
       window.location.href = '/';
