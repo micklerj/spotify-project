@@ -60,13 +60,13 @@ callback = function(req, res) {
   var state = req.query.state || null;
   var storedState = req.cookies ? req.cookies[stateKey] : null;
   if (state === null || state !== storedState) {
-    res.redirect('https://top-listened-to.netlify.app/?' +
+    res.redirect('https://top-listened-to.netlify.app?' +
       querystring.stringify({
         error: 'state_mismatch'
       })
     );
   } else if (code === null) {
-    res.redirect('https://top-listened-to.netlify.app/?' +
+    res.redirect('https://top-listened-to.netlify.app?' +
       querystring.stringify({
         error: 'not_authorized'
       })
@@ -135,7 +135,7 @@ callback = function(req, res) {
         
           await axios.post('https://spotify-project-lhca.onrender.com/api/newUser', postData);
         
-          res.redirect('https://top-listened-to.netlify.app//profile');
+          res.redirect('https://top-listened-to.netlify.app/profile');
         } catch (error) {
           // console.error('Error:', error);
           // Log the error details when a 403 occurs
@@ -149,7 +149,7 @@ callback = function(req, res) {
         // --------------------------------------------------------------------------
 
       } else {
-        res.redirect('https://top-listened-to.netlify.app/?' +
+        res.redirect('https://top-listened-to.netlify.app?' +
           querystring.stringify({
             error: 'invalid_token'
           })

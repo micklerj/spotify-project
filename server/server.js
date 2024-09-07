@@ -12,7 +12,7 @@ const app = express();
 
 connectDB();
 const corsOptions = { 
-  origin: 'https://top-listened-to.netlify.app/',
+  origin: 'https://top-listened-to.netlify.app',
   credentials: true,  
 };
 app.use(cors(corsOptions));
