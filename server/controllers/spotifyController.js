@@ -8,7 +8,7 @@ const qs = require('qs');
 
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
-const REDIRECT_URI = 'https://spotify-project-lhca.onrender.com/api/callback'
+const REDIRECT_URI = 'http://localhost:3500/api/callback'
 
 var stateKey = 'spotify_auth_state';
 
@@ -60,13 +60,13 @@ callback = function(req, res) {
   var state = req.query.state || null;
   var storedState = req.cookies ? req.cookies[stateKey] : null;
   if (state === null || state !== storedState) {
-    res.redirect('https://wraptify.com?' +
+    res.redirect('http://localhost:3000?' +
       querystring.stringify({
         error: 'state_mismatch'
       })
     );
   } else if (code === null) {
-    res.redirect('https://wraptify.com?' +
+    res.redirect('http://localhost:3000?' +
       querystring.stringify({
         error: 'not_authorized'
       })
@@ -90,6 +90,9 @@ callback = function(req, res) {
     request.post(authOptions, async function(error, response, body) {
       if (!error && response.statusCode === 200) { 
         console.log('Received tokens:', body);
+
+        // Log the granted scopes
+        console.log('Granted Scopes:', body.scope);
  
         req.session.accessToken = body.access_token,
         req.session.refreshToken = body.refresh_token;
@@ -108,7 +111,7 @@ callback = function(req, res) {
           const response = await axios.get(options.url, { headers: options.headers });
           const body = response.data;
         
-          const userCountResponse = await axios.get('https://spotify-project-lhca.onrender.com/api/getUserCount');
+          const userCountResponse = await axios.get('http://localhost:3500/api/getUserCount');
           const userCount = userCountResponse.data.count;
         
           const postData = {
@@ -130,17 +133,23 @@ callback = function(req, res) {
             "topGenres1Y": []
           }
         
-          await axios.post('https://spotify-project-lhca.onrender.com/api/newUser', postData);
+          await axios.post('http://localhost:3500/api/newUser', postData);
         
-          res.redirect('https://wraptify.com/profile');
+          res.redirect('http://localhost:3000/profile');
         } catch (error) {
-          console.error('Error:', error);
+          // console.error('Error:', error);
+          // Log the error details when a 403 occurs
+          if (error.response && error.response.status === 403) {
+            console.error('Spotify API 403 Error:', error.response.data);
+          } else {
+            console.error('Other Error:', error);
+          }
           res.status(500).send('An error occurred');
         }
         // --------------------------------------------------------------------------
 
       } else {
-        res.redirect('https://wraptify.com?' +
+        res.redirect('http://localhost:3000?' +
           querystring.stringify({
             error: 'invalid_token'
           })
@@ -196,7 +205,7 @@ topArtists = function(req, res) {
           [topArtistsTime]: artistArray
         }
 
-        axios.put('https://spotify-project-lhca.onrender.com/api/updateUser', putData)
+        axios.put('http://localhost:3500/api/updateUser', putData)
           .catch((error) => { 
             console.error('Error:', error);
           })
@@ -255,7 +264,7 @@ topSongs = function(req, res) {
           [topSongsTime]: songArray
         }
 
-        axios.put('https://spotify-project-lhca.onrender.com/api/updateUser', putData)
+        axios.put('http://localhost:3500/api/updateUser', putData)
           .catch((error) => { 
             console.error('Error:', error);
           })
@@ -373,7 +382,7 @@ topGenres = async function(req, res) {
       [topGenresTime]: sortedGenreRanks.slice(0, 10).map(pair => pair[0])
     }
 
-    await axios.put('https://spotify-project-lhca.onrender.com/api/updateUser', putData)
+    await axios.put('http://localhost:3500/api/updateUser', putData)
       .catch((error) => { 
         console.error('Error:', error);
       })

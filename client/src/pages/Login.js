@@ -4,7 +4,7 @@ import './styles/Login.css';
 function Login() {
 
   async function handleLogin() {
-    window.location.href = 'https://spotify-project-lhca.onrender.com/api/login';
+    window.location.href = 'http://localhost:3500/api/login';
   }
 
   return (
@@ -13,11 +13,11 @@ function Login() {
       <div className='login-body-container'>
 
         <div className='title'>
-          Wraptify
+          top listened to
         </div>
 
         <div className="login-container">
-          <p className='h1'>Welcome to Wraptify</p>
+          <p className='h1'>Welcome to top-listened-to</p>
           <p className='h2'>Discover your most played artists, songs, and genres</p>
           <p className='h3'>See what your friends have been listening to, and find new friends with similar music tastes</p>
           <button 
