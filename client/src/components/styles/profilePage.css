@@ -414,6 +414,7 @@ body {
 .song-item-image {
   width: 50px;
   margin-right: 10px;
+  border-radius: 4px;
 }
 
 /* genre list */
@@ -441,6 +442,12 @@ body {
 }
 .genre-item-link:hover {
   color: #c6c6c6;
+}
+
+.SpotifyLogo {
+  width: 70px;
+  display: block;
+  margin: 0 auto;
 }
 
 /* private user message */
